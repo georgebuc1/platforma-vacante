@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Eye, Send, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
-import { getOffers, getOfferById, saveOffer, deleteOffer } from '@/services/storageService';
+import { Save, Eye, Send, Trash2, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { getOfferById, saveOffer, deleteOffer, getExistingSlugs } from '@/services/storageService';
 import { deleteOfferImage } from '@/services/imageService';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import ImageUploader from '@/components/admin/ImageUploader';
 import { calculateTotalPrice, calculateDurationDays, calculateDurationNights } from '@/utils/pricing';
-import { slugify } from '@/utils/slugify';
+import { generateSlug, validateSlug, ensureUniqueSlug } from '@/utils/slugify';
 import { DEPARTURE_CITIES, TRIP_TYPES } from '@/components/search/SearchForm';
 import type {
   Offer, OfferStatus, Currency, PriceType, TransportType, MealType, StopsType, TripType,
@@ -72,12 +72,22 @@ export default function AdminOfferForm() {
     });
   }, [id]);
 
-  // Auto-generate slug from title
+  // Auto-generate slug from title (only on create, not on edit)
   useEffect(() => {
     if (!slugEdited && offer.title) {
-      setOffer((o) => ({ ...o, slug: slugify(o.title) }));
+      setOffer((o) => ({ ...o, slug: generateSlug(o.title) }));
     }
   }, [offer.title, slugEdited]);
+
+  const regenerateSlug = () => {
+    if (!offer.title.trim()) {
+      showToast('Introdu un titlu pentru a genera slug-ul.', 'error');
+      return;
+    }
+    setSlugEdited(false);
+    setOffer((o) => ({ ...o, slug: generateSlug(o.title) }));
+    showToast('Slug-ul a fost regenerat din titlu.', 'success');
+  };
 
   // Auto-calculate duration and total
   useEffect(() => {
@@ -121,11 +131,19 @@ export default function AdminOfferForm() {
     if (offer.trip_types.length === 0 && forPublish) errs.trip_types = 'Selectează cel puțin un tip de vacanță.';
     if (offer.offer_score < 1 || offer.offer_score > 10) errs.offer_score = 'Scorul trebuie să fie între 1 și 10.';
 
-    // Check slug uniqueness async
-    if (offer.slug) {
-      const allOffers = await getOffers();
-      const conflict = allOffers.find((o) => o.slug === offer.slug && o.id !== offer.id);
-      if (conflict) errs.slug = 'Acest slug este deja folosit. Alege altul.';
+    // Validate slug format
+    const slugError = validateSlug(offer.slug);
+    if (slugError) {
+      errs.slug = slugError;
+    } else {
+      // Check slug uniqueness in Supabase
+      const existingSlugs = await getExistingSlugs(offer.id);
+      if (existingSlugs.includes(offer.slug)) {
+        const unique = ensureUniqueSlug(offer.slug, existingSlugs, offer.id);
+        if (unique !== offer.slug) {
+          errs.slug = `Acest slug există deja. Sugestie: ${unique}`;
+        }
+      }
     }
 
     setErrors(errs);
@@ -226,7 +244,17 @@ export default function AdminOfferForm() {
               <input type="text" value={offer.title} onChange={(e) => update('title', e.target.value)} className="input-field" placeholder="Ex: Creta – 7 zile cu plecare din București" />
             </Field>
             <Field label="Slug (URL)" required error={errors.slug}>
-              <input type="text" value={offer.slug} onChange={(e) => { update('slug', e.target.value); setSlugEdited(true); }} className="input-field" placeholder="creta-7-zile-plecare-bucuresti" />
+              <div className="flex gap-2">
+                <input type="text" value={offer.slug} onChange={(e) => { update('slug', e.target.value); setSlugEdited(true); }} className="input-field" placeholder="creta-7-zile-plecare-bucuresti" />
+                <button type="button" onClick={regenerateSlug} className="btn-secondary shrink-0" title="Regenerează slug din titlu">
+                  <RefreshCw className="h-4 w-4" />
+                </button>
+              </div>
+              {offer.slug && (
+                <p className="mt-2 text-xs text-slate-400">
+                  URL final: <span className="text-brand-600 font-medium">https://ofertevacante.netlify.app/oferte/{offer.slug}</span>
+                </p>
+              )}
             </Field>
           </FieldGroup>
           <Field label="Descriere scurtă" required error={errors.short_description}>

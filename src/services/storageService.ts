@@ -150,6 +150,18 @@ export async function getOfferBySlug(slug: string): Promise<Offer | undefined> {
   return rowToOffer(data as DbOfferRow);
 }
 
+/** Return all slugs currently in the database, for uniqueness checks. */
+export async function getExistingSlugs(excludeId?: string): Promise<string[]> {
+  let query = supabase.from('offers').select('slug');
+  if (excludeId) {
+    const numId = Number(excludeId);
+    if (!isNaN(numId)) query = query.neq('id', numId);
+  }
+  const { data, error } = await query;
+  if (error || !data) return [];
+  return (data as Pick<DbOfferRow, 'slug'>[]).map((r) => r.slug ?? '').filter(Boolean);
+}
+
 export async function saveOffer(offer: Offer): Promise<Offer> {
   const payload = offerToPayload(offer);
   const numId = Number(offer.id);
