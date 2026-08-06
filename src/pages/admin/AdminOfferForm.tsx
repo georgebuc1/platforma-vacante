@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Eye, Send, Trash2, ArrowLeft, Loader2, Upload, ImageIcon, X, AlertCircle } from 'lucide-react';
+import { Save, Eye, Send, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import { getOffers, getOfferById, saveOffer, deleteOffer } from '@/services/storageService';
-import { uploadOfferImage, deleteOfferImage } from '@/services/imageService';
+import { deleteOfferImage } from '@/services/imageService';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
+import ImageUploader from '@/components/admin/ImageUploader';
 import { calculateTotalPrice, calculateDurationDays, calculateDurationNights } from '@/utils/pricing';
 import { slugify } from '@/utils/slugify';
 import { DEPARTURE_CITIES, TRIP_TYPES } from '@/components/search/SearchForm';
@@ -59,11 +60,6 @@ export default function AdminOfferForm() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [slugEdited, setSlugEdited] = useState(isEdit);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [imageError, setImageError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const previousImageRef = useRef<string>('');
 
   // Load existing offer when editing
   useEffect(() => {
@@ -71,7 +67,6 @@ export default function AdminOfferForm() {
     getOfferById(id).then((existing) => {
       if (existing) {
         setOffer({ ...existing });
-        previousImageRef.current = existing.main_image_url;
       }
       setLoadingOffer(false);
     });
@@ -195,38 +190,10 @@ export default function AdminOfferForm() {
     }
   };
 
-  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageError('');
-    setUploading(true);
-    setUploadProgress(0);
-    try {
-      const result = await uploadOfferImage(file, {
-        onProgress: (pct) => setUploadProgress(pct),
-      });
-      // Delete old image from storage if it was a Supabase upload
-      if (previousImageRef.current && previousImageRef.current !== result.publicUrl) {
-        await deleteOfferImage(previousImageRef.current);
-      }
-      previousImageRef.current = result.publicUrl;
-      update('main_image_url', result.publicUrl);
-      showToast('Imaginea a fost încărcată cu succes.', 'success');
-    } catch (err) {
-      setImageError(err instanceof Error ? err.message : 'Eroare la încărcarea imaginii.');
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  const handleRemoveImage = async () => {
-    if (!offer.main_image_url) return;
-    await deleteOfferImage(offer.main_image_url);
-    previousImageRef.current = '';
-    update('main_image_url', '');
-    setImageError('');
+  const handleImagesChange = (images: string[]) => {
+    const mainImage = images[0] || '';
+    const gallery = images.slice(1);
+    setOffer((o) => ({ ...o, main_image_url: mainImage, gallery_images: gallery }));
   };
 
   const totalPreview = useMemo(() => calculateTotalPrice(offer), [offer]);
@@ -448,90 +415,17 @@ export default function AdminOfferForm() {
           </Field>
         </FormSection>
 
-        {/* Section 7 */}
-        <FormSection title="Imagine principală" number={7}>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            onChange={handleImageSelect}
-            className="hidden"
+        {/* Section 7 — Imagini (principală + galerie) */}
+        <FormSection title="Imagini" number={7}>
+          <p className="text-sm text-slate-500 -mt-2">
+            Prima imagine devine imaginea principală. Restul intră în galerie. Trage imaginile pentru a schimba ordinea.
+          </p>
+          <ImageUploader
+            initialImages={[offer.main_image_url, ...(offer.gallery_images || [])].filter(Boolean)}
+            onChange={handleImagesChange}
+            maxImages={10}
           />
-          {imageError && (
-            <div className="flex items-start gap-2 rounded-xl bg-error-50 border border-error-100 p-3 text-sm text-error-700">
-              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-              <span>{imageError}</span>
-            </div>
-          )}
-          {offer.main_image_url && !uploading ? (
-            <div className="space-y-3">
-              <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-slate-100 max-w-md group">
-                <img src={offer.main_image_url} alt="Preview" className="h-full w-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = `https://placehold.co/640x400/e2e8f0/64748b?text=Imagine+indisponibila`; }} />
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-lg bg-error-600 text-white hover:bg-error-700 shadow-lg transition-colors"
-                  title="Șterge imaginea"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="btn-secondary text-sm"
-              >
-                <Upload className="h-4 w-4" /> Înlocuiește imaginea
-              </button>
-            </div>
-          ) : uploading ? (
-            <div className="space-y-3 max-w-md">
-              <div className="flex items-center gap-3 rounded-xl bg-brand-50 border border-brand-100 p-4">
-                <Loader2 className="h-5 w-5 animate-spin text-brand-500 shrink-0" />
-                <div className="flex-1">
-                  <div className="text-sm font-semibold text-brand-700">Se încarcă imaginea... {uploadProgress}%</div>
-                  <div className="mt-2 h-2 rounded-full bg-brand-100 overflow-hidden">
-                    <div
-                      className="h-full bg-brand-500 transition-all duration-200 ease-out"
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-3 w-full max-w-md rounded-xl border-2 border-dashed border-slate-300 hover:border-brand-400 hover:bg-brand-50/50 transition-colors py-12 cursor-pointer"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-400">
-                <ImageIcon className="h-6 w-6" />
-              </div>
-              <div className="text-sm font-semibold text-slate-600">Selectează o imagine</div>
-              <div className="text-xs text-slate-400">JPG, PNG sau WEBP — maxim 5 MB</div>
-            </button>
-          )}
           {errors.main_image_url && <p className="text-xs text-error-600">{errors.main_image_url}</p>}
-        </FormSection>
-
-        {/* Section 8 */}
-        <FormSection title="Galerie" number={8}>
-          <Field label="Imagini galerie (URL-uri separate prin virgulă)">
-            <textarea
-              value={(offer.gallery_images || []).join(', ')}
-              onChange={(e) => update('gallery_images', e.target.value.split(',').map((s) => s.trim()).filter(Boolean))}
-              rows={2} className="input-field resize-none" placeholder="https://..., https://..." />
-          </Field>
-          {(offer.gallery_images || []).length > 0 && (
-            <div className="flex gap-3 flex-wrap">
-              {(offer.gallery_images || []).map((img, idx) => (
-                <div key={idx} className="h-20 w-28 rounded-lg overflow-hidden bg-slate-100 shrink-0">
-                  <img src={img} alt={`Galerie ${idx + 1}`} className="h-full w-full object-cover" loading="lazy" />
-                </div>
-              ))}
-            </div>
-          )}
         </FormSection>
 
         {/* Section 9 */}

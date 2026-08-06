@@ -7,7 +7,7 @@ import { formatPrice, formatDateShort } from '@/utils/pricing';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import Pagination from '@/components/common/Pagination';
-import type { Offer, OfferStatus, TransportType } from '@/types';
+import type { Offer, OfferStatus } from '@/types';
 
 const STATUS_LABELS: Record<OfferStatus, string> = {
   draft: 'Draft', active: 'Activă', expired: 'Expirată', archived: 'Arhivată',
