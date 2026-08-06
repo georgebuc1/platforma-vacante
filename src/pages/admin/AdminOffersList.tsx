@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, PlusCircle, Edit, Trash2, Eye, Archive, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { getOffers, deleteOffer, updateOffer } from '@/services/storageService';
+import { deleteOfferImage } from '@/services/imageService';
 import { formatPrice, formatDateShort } from '@/utils/pricing';
 import { showToast } from '@/components/common/Toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import type { Offer, OfferStatus } from '@/types';
 
 const STATUS_LABELS: Record<OfferStatus, string> = {
@@ -43,11 +45,27 @@ export default function AdminOffersList() {
     return result;
   }, [offers, search, statusFilter, sort]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Sigur vrei să ștergi această ofertă?')) return;
-    await deleteOffer(id);
-    await reload();
-    showToast('Oferta a fost ștearsă.', 'success');
+  const [deleteTarget, setDeleteTarget] = useState<Offer | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = (offer: Offer) => setDeleteTarget(offer);
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteOffer(deleteTarget.id);
+      if (deleteTarget.main_image_url) {
+        await deleteOfferImage(deleteTarget.main_image_url);
+      }
+      await reload();
+      showToast('Oferta a fost ștearsă.', 'success');
+    } catch {
+      showToast('Eroare la ștergere.', 'error');
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   };
 
   const handleStatusChange = async (id: string, status: OfferStatus) => {
@@ -127,7 +145,7 @@ export default function AdminOffersList() {
                         {offer.status !== 'active' && <button onClick={() => handleStatusChange(offer.id, 'active')} className="p-2 rounded-lg text-success-600 hover:bg-success-50" title="Publică"><CheckCircle className="h-4 w-4" /></button>}
                         {offer.status !== 'expired' && <button onClick={() => handleStatusChange(offer.id, 'expired')} className="p-2 rounded-lg text-error-600 hover:bg-error-50" title="Marchează expirată"><XCircle className="h-4 w-4" /></button>}
                         {offer.status !== 'archived' && <button onClick={() => handleStatusChange(offer.id, 'archived')} className="p-2 rounded-lg text-warning-600 hover:bg-warning-50" title="Arhivează"><Archive className="h-4 w-4" /></button>}
-                        <button onClick={() => handleDelete(offer.id)} className="p-2 rounded-lg text-error-600 hover:bg-error-50" title="Șterge"><Trash2 className="h-4 w-4" /></button>
+                        <button onClick={() => handleDelete(offer)} className="p-2 rounded-lg text-error-600 hover:bg-error-50" title="Șterge"><Trash2 className="h-4 w-4" /></button>
                       </div>
                     </td>
                   </tr>
@@ -154,7 +172,7 @@ export default function AdminOffersList() {
                   <Link to={`/admin/oferte/${offer.id}/edit`} className="btn-ghost text-xs py-2"><Edit className="h-3.5 w-3.5" /> Editează</Link>
                   <Link to={`/oferte/${offer.slug}`} target="_blank" className="btn-ghost text-xs py-2"><Eye className="h-3.5 w-3.5" /> Vezi</Link>
                   {offer.status !== 'active' && <button onClick={() => handleStatusChange(offer.id, 'active')} className="btn-ghost text-xs py-2 text-success-600"><CheckCircle className="h-3.5 w-3.5" /> Publică</button>}
-                  <button onClick={() => handleDelete(offer.id)} className="btn-ghost text-xs py-2 text-error-600"><Trash2 className="h-3.5 w-3.5" /> Șterge</button>
+                  <button onClick={() => handleDelete(offer)} className="btn-ghost text-xs py-2 text-error-600"><Trash2 className="h-3.5 w-3.5" /> Șterge</button>
                 </div>
               </div>
             ))}
@@ -162,6 +180,17 @@ export default function AdminOffersList() {
           </div>
         </>
       )}
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Ștergere ofertă"
+        message="Sigur dorești să ștergi această ofertă?"
+        warning="Această acțiune nu poate fi anulată."
+        confirmLabel="Șterge"
+        cancelLabel="Renunță"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

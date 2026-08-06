@@ -3,9 +3,10 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Save, Eye, Send, Trash2, ArrowLeft, Loader2, Upload, ImageIcon, X, AlertCircle } from 'lucide-react';
 import { getOffers, getOfferById, saveOffer, deleteOffer } from '@/services/storageService';
 import { uploadOfferImage, deleteOfferImage } from '@/services/imageService';
+import { showToast } from '@/components/common/Toast';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { calculateTotalPrice, calculateDurationDays, calculateDurationNights } from '@/utils/pricing';
 import { slugify } from '@/utils/slugify';
-import { showToast } from '@/components/common/Toast';
 import { DEPARTURE_CITIES, TRIP_TYPES } from '@/components/search/SearchForm';
 import type {
   Offer, OfferStatus, Currency, PriceType, TransportType, MealType, StopsType, TripType,
@@ -169,12 +170,19 @@ export default function AdminOfferForm() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!id || !confirm('Sigur vrei să ștergi această ofertă?')) return;
-    setSaving(true);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = () => {
+    if (!id) return;
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!id) return;
+    setDeleting(true);
     try {
       await deleteOffer(id);
-      // Also delete the offer image from storage
       if (offer.main_image_url) {
         await deleteOfferImage(offer.main_image_url);
       }
@@ -182,7 +190,8 @@ export default function AdminOfferForm() {
       navigate('/admin/oferte');
     } catch {
       showToast('Eroare la ștergere.', 'error');
-      setSaving(false);
+      setDeleting(false);
+      setShowDeleteDialog(false);
     }
   };
 
@@ -571,6 +580,18 @@ export default function AdminOfferForm() {
           )}
         </div>
       </form>
+
+      <ConfirmDialog
+        open={showDeleteDialog}
+        title="Ștergere ofertă"
+        message="Sigur dorești să ștergi această ofertă?"
+        warning="Această acțiune nu poate fi anulată."
+        confirmLabel="Șterge"
+        cancelLabel="Renunță"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 }
