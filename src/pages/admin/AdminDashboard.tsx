@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  TrendingUp, FileText, FileX, Layers, Bell, MousePointerClick, PlusCircle, Clock,
+  TrendingUp, FileText, FileX, Layers, Bell, MousePointerClick, PlusCircle, Clock, Wallet, CalendarPlus,
 } from 'lucide-react';
 import { getOffers, getAlerts, getClicks } from '@/services/storageService';
-import { formatPrice, formatDate } from '@/utils/pricing';
+import { formatPrice, formatDate, formatDateShort } from '@/utils/pricing';
 import type { Offer, Alert, ClickEvent } from '@/types';
 
 export default function AdminDashboard() {
@@ -20,15 +20,21 @@ export default function AdminDashboard() {
   }, []);
 
   const activeOffers = offers.filter((o) => o.status === 'active');
+  const inactiveOffers = offers.filter((o) => o.status === 'draft' || o.status === 'archived');
   const expiredOffers = offers.filter((o) => o.status === 'expired');
+  const avgPrice = offers.length > 0 ? Math.round(offers.reduce((sum, o) => sum + o.total_price, 0) / offers.length) : 0;
+  const lastOffer = [...offers].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
   const recentOffers = [...offers].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 5);
   const topOffers = [...offers].sort((a, b) => (b.click_count || 0) - (a.click_count || 0)).slice(0, 5);
   const recentClicks = [...clicks].slice(0, 10);
 
   const stats = [
-    { label: 'Oferte active', value: activeOffers.length, icon: FileText, color: 'text-success-600 bg-success-50' },
-    { label: 'Oferte expirate', value: expiredOffers.length, icon: FileX, color: 'text-error-600 bg-error-50' },
     { label: 'Total oferte', value: offers.length, icon: Layers, color: 'text-brand-600 bg-brand-50' },
+    { label: 'Oferte active', value: activeOffers.length, icon: FileText, color: 'text-success-600 bg-success-50' },
+    { label: 'Oferte inactive', value: inactiveOffers.length, icon: FileX, color: 'text-slate-600 bg-slate-100' },
+    { label: 'Preț mediu', value: `${formatPrice(avgPrice, 'RON')}`, icon: Wallet, color: 'text-accent-600 bg-accent-50' },
+    { label: 'Ultima ofertă', value: lastOffer ? formatDateShort(lastOffer.created_at) : '—', icon: CalendarPlus, color: 'text-warning-600 bg-warning-50' },
+    { label: 'Oferte expirate', value: expiredOffers.length, icon: FileX, color: 'text-error-600 bg-error-50' },
     { label: 'Alerte create', value: alerts.length, icon: Bell, color: 'text-accent-600 bg-accent-50' },
     { label: 'Clickuri totale', value: clicks.length, icon: MousePointerClick, color: 'text-slate-600 bg-slate-100' },
   ];
@@ -36,8 +42,8 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="p-6 lg:p-8">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
-          {Array.from({ length: 5 }).map((_, i) => <div key={i} className="card p-5 h-24 animate-pulse bg-slate-100" />)}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          {Array.from({ length: 8 }).map((_, i) => <div key={i} className="card p-5 h-24 animate-pulse bg-slate-100" />)}
         </div>
       </div>
     );
@@ -56,11 +62,13 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {stats.map((stat) => (
           <div key={stat.label} className="card p-5">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl mb-3 ${stat.color}`}>
-              <stat.icon className="h-5 w-5" />
+            <div className="flex items-center justify-between mb-3">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.color}`}>
+                <stat.icon className="h-5 w-5" />
+              </div>
             </div>
             <div className="text-2xl font-extrabold text-slate-900">{stat.value}</div>
             <div className="text-sm text-slate-500">{stat.label}</div>
