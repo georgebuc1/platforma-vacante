@@ -5,6 +5,7 @@ import { formatPrice, formatDate, getOfferPrice } from '@/utils/pricing';
 import { getBadge } from '@/utils/filters';
 import { TRIP_TYPE_LABELS } from '@/components/search/SearchForm';
 import { trackClick } from '@/services/storageService';
+import ImageCarousel from './ImageCarousel';
 
 interface OfferCardProps {
   offer: Offer;
@@ -32,26 +33,25 @@ export default function OfferCard({ offer }: OfferCardProps) {
       className="group card overflow-hidden transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 flex flex-col"
     >
       {/* Image */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
-        <img
-          src={offer.main_image_url}
-          alt={`${offer.destination}, ${offer.country}`}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://placehold.co/800x500/e2e8f0/64748b?text=${encodeURIComponent(offer.destination)}`;
-          }}
-        />
-        {badge && (
-          <span className={`absolute top-3 left-3 badge ${BADGE_STYLES[badge.variant]} shadow-sm`}>
-            {badge.label}
-          </span>
-        )}
-        <span className="absolute top-3 right-3 badge bg-white/95 text-slate-800 shadow-sm">
-          <Star className="h-3 w-3 fill-accent-500 text-accent-500" />
-          {(offer.offer_score || 0).toFixed(1).replace('.', ',')}
-        </span>
-      </div>
+      {/* Image */}
+<div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+  <ImageCarousel
+    mainImage={offer.main_image_url}
+    galleryImages={offer.gallery_images}
+    alt={`${offer.destination}, ${offer.country}`}
+  />
+
+  {badge && (
+    <span className={`absolute top-3 left-3 badge ${BADGE_STYLES[badge.variant]} shadow-sm`}>
+      {badge.label}
+    </span>
+  )}
+
+  <span className="absolute top-3 right-3 badge bg-white/95 text-slate-800 shadow-sm">
+    <Star className="h-3 w-3 fill-accent-500 text-accent-500" />
+    {(offer.offer_score || 0).toFixed(1).replace('.', ',')}
+  </span>
+</div>
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-4">
