@@ -64,6 +64,28 @@ export default function ImageCarousel({
           >
             <ChevronRight className="h-5 w-5" />
           </button>
+
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
+  {images.map((_, index) => (
+    <button
+      key={index}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCurrentIndex(index);
+      }}
+      className={`h-2 w-2 rounded-full transition-all ${
+        index === currentIndex
+          ? 'bg-white'
+          : 'bg-white/50 hover:bg-white/80'
+      }`}
+    />
+  ))}
+</div>
+
+<div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white">
+  {currentIndex + 1} / {images.length}
+</div>
         </>
       )}
     </div>
