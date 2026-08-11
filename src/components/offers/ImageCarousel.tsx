@@ -83,9 +83,7 @@ export default function ImageCarousel({
   ))}
 </div>
 
-<div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-2 py-1 text-xs text-white">
-  {currentIndex + 1} / {images.length}
-</div>
+
         </>
       )}
     </div>
