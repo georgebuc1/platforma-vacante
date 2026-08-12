@@ -102,3 +102,30 @@
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
   }
 }
+
+/* =========================================================
+   FOOTER - DARK MODE
+   ========================================================= */
+
+html.dark .site-footer {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+html.dark .site-footer h4 {
+  color: #f8fafc;
+}
+
+html.dark .site-footer p,
+html.dark .site-footer li,
+html.dark .site-footer a {
+  color: #94a3b8;
+}
+
+html.dark .site-footer a:hover {
+  color: #60a5fa;
+}
+
+html.dark .site-footer .border-t {
+  border-color: #1e293b;
+}

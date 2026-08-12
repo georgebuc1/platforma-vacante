@@ -66,27 +66,58 @@ interface SearchFormProps {
   onSearch?: (filters: SearchFilters) => void;
 }
 
-export default function SearchForm({ defaultFilters, variant = 'hero', onSearch }: SearchFormProps) {
+export default function SearchForm({
+  defaultFilters,
+  variant = 'hero',
+  onSearch,
+}: SearchFormProps) {
   const navigate = useNavigate();
-  const [departureCity, setDepartureCity] = useState(defaultFilters?.departure_city || 'București');
-  const [maxBudget, setMaxBudget] = useState(defaultFilters?.max_budget?.toString() || '2500');
-  const [month, setMonth] = useState(defaultFilters?.month || 'oricand');
-  const [duration, setDuration] = useState(defaultFilters?.duration || 'orice');
-  const [tripType, setTripType] = useState(defaultFilters?.trip_type || 'orice');
+
+  const [departureCity, setDepartureCity] = useState(
+    defaultFilters?.departure_city || 'București'
+  );
+
+  const [maxBudget, setMaxBudget] = useState(
+    defaultFilters?.max_budget?.toString() || '2500'
+  );
+
+  const [month, setMonth] = useState(
+    defaultFilters?.month || 'oricand'
+  );
+
+  const [duration, setDuration] = useState(
+    defaultFilters?.duration || 'orice'
+  );
+
+  const [tripType, setTripType] = useState(
+    defaultFilters?.trip_type || 'orice'
+  );
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
     const errs: Record<string, string> = {};
-    if (!departureCity) errs.departureCity = 'Alege orașul de plecare.';
+
+    if (!departureCity) {
+      errs.departureCity = 'Alege orașul de plecare.';
+    }
+
     const budgetNum = Number(maxBudget);
-    if (!maxBudget || isNaN(budgetNum) || budgetNum <= 0) errs.maxBudget = 'Introdu un buget valid.';
+
+    if (!maxBudget || isNaN(budgetNum) || budgetNum <= 0) {
+      errs.maxBudget = 'Introdu un buget valid.';
+    }
+
     setErrors(errs);
+
     return Object.keys(errs).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!validate()) return;
+
     const filters: SearchFilters = {
       departure_city: departureCity,
       max_budget: Number(maxBudget),
@@ -94,6 +125,7 @@ export default function SearchForm({ defaultFilters, variant = 'hero', onSearch 
       duration,
       trip_type: tripType,
     };
+
     if (onSearch) {
       onSearch(filters);
     } else {
@@ -106,33 +138,50 @@ export default function SearchForm({ defaultFilters, variant = 'hero', onSearch 
   return (
     <form
       onSubmit={handleSubmit}
-      className={`bg-white rounded-2xl shadow-card-hover border border-slate-100 ${
+      className={`bg-white rounded-2xl shadow-card-hover border border-slate-200 ${
         isHero ? 'p-5 sm:p-6' : 'p-4'
       }`}
     >
-      <div className={`grid gap-4 ${isHero ? 'sm:grid-cols-2 lg:grid-cols-5' : 'sm:grid-cols-2 lg:grid-cols-5'}`}>
+      <div
+        className={`grid gap-4 ${
+          isHero
+            ? 'sm:grid-cols-2 lg:grid-cols-5'
+            : 'sm:grid-cols-2 lg:grid-cols-5'
+        }`}
+      >
         {/* Departure city */}
         <div>
-          <label className="label-field flex items-center gap-1.5">
-            <MapPin className="h-4 w-4 text-brand-500" /> De unde pleci?
+          <label className="label-field !text-slate-700 flex items-center gap-1.5">
+            <MapPin className="h-4 w-4 text-brand-500" />
+            De unde pleci?
           </label>
+
           <select
             value={departureCity}
             onChange={(e) => setDepartureCity(e.target.value)}
             className="input-field"
           >
             {DEPARTURE_CITIES.map((c) => (
-              <option key={c} value={c}>{c}</option>
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
           </select>
-          {errors.departureCity && <p className="mt-1 text-xs text-error-600">{errors.departureCity}</p>}
+
+          {errors.departureCity && (
+            <p className="mt-1 text-xs text-error-600">
+              {errors.departureCity}
+            </p>
+          )}
         </div>
 
         {/* Budget */}
         <div>
-          <label className="label-field flex items-center gap-1.5">
-            <Wallet className="h-4 w-4 text-brand-500" /> Cât vrei să cheltuiești?
+          <label className="label-field !text-slate-700 flex items-center gap-1.5">
+            <Wallet className="h-4 w-4 text-brand-500" />
+            Cât vrei să cheltuiești?
           </label>
+
           <div className="relative">
             <input
               type="number"
@@ -143,51 +192,86 @@ export default function SearchForm({ defaultFilters, variant = 'hero', onSearch 
               className="input-field pr-20"
               placeholder="2500"
             />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">
+
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 font-medium">
               RON / pers.
             </span>
           </div>
-          {errors.maxBudget && <p className="mt-1 text-xs text-error-600">{errors.maxBudget}</p>}
+
+          {errors.maxBudget && (
+            <p className="mt-1 text-xs text-error-600">
+              {errors.maxBudget}
+            </p>
+          )}
         </div>
 
         {/* Month */}
         <div>
-          <label className="label-field flex items-center gap-1.5">
-            <Calendar className="h-4 w-4 text-brand-500" /> Când vrei să pleci?
+          <label className="label-field !text-slate-700 flex items-center gap-1.5">
+            <Calendar className="h-4 w-4 text-brand-500" />
+            Când vrei să pleci?
           </label>
-          <select value={month} onChange={(e) => setMonth(e.target.value)} className="input-field">
+
+          <select
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="input-field"
+          >
             {MONTHS.map((m) => (
-              <option key={m.value} value={m.value}>{m.label}</option>
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Duration */}
         <div>
-          <label className="label-field flex items-center gap-1.5">
-            <Clock className="h-4 w-4 text-brand-500" /> Cât timp vrei să stai?
+          <label className="label-field !text-slate-700 flex items-center gap-1.5">
+            <Clock className="h-4 w-4 text-brand-500" />
+            Cât timp vrei să stai?
           </label>
-          <select value={duration} onChange={(e) => setDuration(e.target.value)} className="input-field">
+
+          <select
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            className="input-field"
+          >
             {DURATIONS.map((d) => (
-              <option key={d.value} value={d.value}>{d.label}</option>
+              <option key={d.value} value={d.value}>
+                {d.label}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Trip type */}
         <div>
-          <label className="label-field flex items-center gap-1.5">
-            <Compass className="h-4 w-4 text-brand-500" /> Ce fel de vacanță vrei?
+          <label className="label-field !text-slate-700 flex items-center gap-1.5">
+            <Compass className="h-4 w-4 text-brand-500" />
+            Ce fel de vacanță vrei?
           </label>
-          <select value={tripType} onChange={(e) => setTripType(e.target.value)} className="input-field">
+
+          <select
+            value={tripType}
+            onChange={(e) => setTripType(e.target.value)}
+            className="input-field"
+          >
             {TRIP_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
-      <button type="submit" className={`btn-primary w-full mt-5 ${isHero ? 'text-base py-4' : ''}`}>
+      <button
+        type="submit"
+        className={`btn-primary w-full mt-5 ${
+          isHero ? 'text-base py-4' : ''
+        }`}
+      >
         <Search className="h-5 w-5" />
         GĂSEȘTE-MI VACANȚA
       </button>

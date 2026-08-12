@@ -42,7 +42,7 @@ export default function ImageCarousel({
   };
 
   return (
-    <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+    <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-slate-800">
       <img
         src={images[currentIndex]}
         alt={alt}
@@ -51,39 +51,77 @@ export default function ImageCarousel({
 
       {hasMultipleImages && (
         <>
+          {/* Previous */}
           <button
+            type="button"
+            aria-label="Imaginea anterioară"
             onClick={previousImage}
-            className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow hover:bg-white"
+            className="
+              absolute left-3 top-1/2 -translate-y-1/2
+              flex h-10 w-10 items-center justify-center
+              rounded-full
+              border border-white/20
+              bg-slate-900/35
+              text-white
+              shadow-lg
+              backdrop-blur-md
+              transition-all duration-200
+              hover:bg-slate-900/60
+              hover:border-white/35
+              hover:scale-105
+              active:scale-95
+            "
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
           </button>
 
+          {/* Next */}
           <button
+            type="button"
+            aria-label="Imaginea următoare"
             onClick={nextImage}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-2 shadow hover:bg-white"
+            className="
+              absolute right-3 top-1/2 -translate-y-1/2
+              flex h-10 w-10 items-center justify-center
+              rounded-full
+              border border-white/20
+              bg-slate-900/35
+              text-white
+              shadow-lg
+              backdrop-blur-md
+              transition-all duration-200
+              hover:bg-slate-900/60
+              hover:border-white/35
+              hover:scale-105
+              active:scale-95
+            "
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
           </button>
 
-          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
-  {images.map((_, index) => (
-    <button
-      key={index}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setCurrentIndex(index);
-      }}
-      className={`h-2 w-2 rounded-full transition-all ${
-        index === currentIndex
-          ? 'bg-white'
-          : 'bg-white/50 hover:bg-white/80'
-      }`}
-    />
-  ))}
-</div>
-
-
+          {/* Image indicators */}
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-slate-900/30 px-2.5 py-1.5 backdrop-blur-sm">
+            {images.map((_, index) => (
+              <button
+                type="button"
+                key={index}
+                aria-label={`Imaginea ${index + 1}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setCurrentIndex(index);
+                }}
+                className={`
+                  rounded-full transition-all duration-200
+                  ${
+                    index === currentIndex
+                      ? 'h-2 w-5 bg-white shadow-sm'
+                      : 'h-2 w-2 bg-white/50 hover:bg-white/80'
+                  }
+                `}
+              />
+            ))}
+          </div>
         </>
       )}
     </div>
