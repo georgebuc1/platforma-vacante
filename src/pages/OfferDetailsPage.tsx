@@ -414,78 +414,95 @@ export default function OfferDetailsPage() {
         {/* Sidebar */}
         <div className="lg:block">
           <div className="sticky top-24 space-y-4">
-            {/* Price */}
-            <div className="card p-6">
-              <h2 className="mb-4 text-lg font-bold text-slate-900 dark:text-slate-100">
-                Prețul vacanței
-              </h2>
+           {/* Price / Booking CTA */}
+<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900 dark:shadow-none">
+  {/* Header */}
+  <div className="border-b border-slate-100 px-6 py-5 dark:border-slate-800">
+    <div className="flex items-center justify-between gap-3">
+      <div>
+        <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          Prețul vacanței
+        </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-500 dark:text-slate-400">
-                    Preț / persoană
-                  </span>
+        <div className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+          Verifică prețul final la furnizor
+        </div>
+      </div>
 
-                  <span className="font-medium text-slate-700 dark:text-slate-200">
-                    {formatPrice(price, offer.currency)}
-                  </span>
-                </div>
+      {badge && (
+        <span
+          className={`badge shadow-sm ${BADGE_STYLES[badge.variant]}`}
+        >
+          {badge.label}
+        </span>
+      )}
+    </div>
+  </div>
 
-                {offer.price_total && offer.price_total !== price && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-500 dark:text-slate-400">
-                      Preț total
-                    </span>
+  {/* Price */}
+  <div className="px-6 py-6">
+    <div className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
+      De la
+    </div>
 
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      {formatPrice(offer.price_total, offer.currency)}
-                    </span>
-                  </div>
-                )}
+    <div className="mt-1 flex items-baseline gap-2">
+      <span className="text-4xl font-extrabold tracking-tight text-brand-600 dark:text-brand-400">
+        {formatPrice(price, offer.currency)}
+      </span>
 
-                <div className="mt-3 flex items-baseline justify-between border-t border-slate-100 pt-3 dark:border-slate-800">
-                  <span className="font-bold text-slate-900 dark:text-white">
-                    TOTAL
-                  </span>
+      <span className="text-sm text-slate-500 dark:text-slate-400">
+        / persoană
+      </span>
+    </div>
 
-                  <div className="text-right">
-                    <div className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">
-                      {formatPrice(price, offer.currency)}
-                    </div>
+    {offer.price_total && offer.price_total !== price && (
+      <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+        Preț total:{' '}
+        <span className="font-semibold text-slate-700 dark:text-slate-200">
+          {formatPrice(offer.price_total, offer.currency)}
+        </span>
+      </div>
+    )}
 
-                    <div className="text-xs text-slate-400 dark:text-slate-500">
-                      / persoană
-                    </div>
-                  </div>
-                </div>
-              </div>
+    {/* CTA */}
+    <button
+      onClick={handleVerifyOffer}
+      className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-4 text-base font-extrabold text-white shadow-md shadow-brand-600/20 transition-all hover:bg-brand-700 hover:shadow-lg hover:shadow-brand-600/30 active:scale-[0.98] dark:bg-brand-500 dark:hover:bg-brand-400"
+    >
+      VERIFICĂ OFERTA
+      <ExternalLink className="h-5 w-5" />
+    </button>
 
-              <button
-                onClick={handleVerifyOffer}
-                className="btn-primary mt-6 w-full"
-              >
-                VERIFICĂ OFERTA
-                <ExternalLink className="h-5 w-5" />
-              </button>
+    <div className="mt-3 text-center text-xs text-slate-400 dark:text-slate-500">
+      Verifică prețul și disponibilitatea actuală
+    </div>
 
-              {showRedirectMsg && (
-                <div className="mt-3 flex items-start gap-2 rounded-xl bg-brand-50 p-3 text-xs text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">
-                  <Info className="mt-0.5 h-4 w-4 shrink-0" />
+    {/* Redirect message */}
+    {showRedirectMsg && (
+      <div className="mt-4 flex items-start gap-2 rounded-xl bg-brand-50 p-3 text-xs leading-relaxed text-brand-700 dark:bg-brand-950/40 dark:text-brand-300">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" />
 
-                  <span>
-                    Vei fi redirecționat către furnizorul ofertei. Prețurile și
-                    disponibilitatea pot varia.
-                  </span>
-                </div>
-              )}
+        <span>
+          Vei fi redirecționat către furnizorul ofertei. Prețurile și
+          disponibilitatea pot varia.
+        </span>
+      </div>
+    )}
+  </div>
 
-              <div className="mt-4 text-center text-xs text-slate-400 dark:text-slate-500">
-                Furnizor:{' '}
-                <span className="font-medium text-slate-600 dark:text-slate-300">
-                  {offer.provider_name}
-                </span>
-              </div>
-            </div>
+  {/* Provider */}
+  <div className="border-t border-slate-100 bg-slate-50/70 px-6 py-4 dark:border-slate-800 dark:bg-slate-950/40">
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-xs text-slate-500 dark:text-slate-400">
+        Furnizor
+      </span>
+
+      <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+        {offer.provider_name}
+      </span>
+    </div>
+  </div>
+</div>
 
             {/* Last checked */}
             <div className="card p-4">
