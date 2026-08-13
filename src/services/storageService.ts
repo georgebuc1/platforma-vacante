@@ -306,14 +306,11 @@ export async function trackClick(offerId: string, offerSlug: string, action: Cli
   } as Partial<DbClickRow>);
 
   if (!isNaN(numId)) {
-    const { data } = await supabase.from('offers').select('click_count, clicks').eq('id', numId).maybeSingle();
-    if (data) {
-      const current = (data as Pick<DbOfferRow, 'click_count' | 'clicks'>).click_count ?? 0;
-      await supabase
-        .from('offers')
-        .update({ click_count: current + 1, clicks: current + 1 } as Partial<DbOfferRow>)
-        .eq('id', numId);
-    }
+    // Uses a narrow SECURITY DEFINER function instead of a direct UPDATE,
+    // so anonymous visitors can bump the counter without needing write
+    // access to the rest of the offers table (see RLS migration).
+    const { error } = await supabase.rpc('increment_offer_clicks', { offer_id_input: numId });
+    if (error) console.error('increment_offer_clicks:', error.message);
   }
 }
 
