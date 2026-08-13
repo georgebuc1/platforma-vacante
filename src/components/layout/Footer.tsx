@@ -3,23 +3,23 @@ import { Plane, Mail } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="site-footer mt-20 border-t border-slate-200 bg-white transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950">
+    <footer className="site-footer mt-20 border-t border-navy-700/50 bg-navy-700 transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950">
       <div className="container-page py-12">
         <div className="grid gap-8 md:grid-cols-4">
 
           {/* Brand */}
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white shadow-sm">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-navy-700 shadow-sm">
                 <Plane className="h-5 w-5" />
               </span>
 
-              <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <span className="text-lg font-extrabold tracking-tight text-white">
                 Vacanța Mea
               </span>
             </Link>
 
-            <p className="mt-4 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
+            <p className="mt-4 max-w-sm text-sm leading-6 text-navy-200 dark:text-slate-400">
               Platformă românească care te ajută să găsești vacanța potrivită
               în funcție de buget, perioadă și preferințele tale.
             </p>
@@ -27,7 +27,7 @@ export default function Footer() {
 
           {/* Navigare */}
           <div>
-            <h4 className="mb-3 text-sm font-bold text-slate-900 dark:text-white">
+            <h4 className="mb-3 text-sm font-bold text-white">
               Navigare
             </h4>
 
@@ -35,7 +35,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/"
-                  className="text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >
                   Acasă
                 </Link>
@@ -44,7 +44,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/oferte"
-                  className="text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >
                   Oferte
                 </Link>
@@ -53,7 +53,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/alerte"
-                  className="text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >
                   Alerte
                 </Link>
@@ -62,7 +62,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/despre"
-                  className="text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >
                   Despre noi
                 </Link>
@@ -71,7 +71,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/contact"
-                  className="text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >
                   Contact
                 </Link>
@@ -81,12 +81,12 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="mb-3 text-sm font-bold text-slate-900 dark:text-white">
+            <h4 className="mb-3 text-sm font-bold text-white">
               Contact
             </h4>
 
             <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+              <li className="flex items-center gap-2 text-navy-200 dark:text-slate-400">
                 <Mail className="h-4 w-4 shrink-0" />
                 contact@vacantamea.ro
               </li>
@@ -94,7 +94,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/admin"
-                  className="text-slate-500 transition-colors hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >
                   Admin Panel
                 </Link>
@@ -104,7 +104,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 text-xs text-slate-400 dark:border-slate-800 dark:text-slate-500 sm:flex-row">
+        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-navy-600/60 pt-6 text-xs text-navy-300 dark:border-slate-800 dark:text-slate-500 sm:flex-row">
           <p>
             © {new Date().getFullYear()} Vacanța Mea. Toate drepturile rezervate.
           </p>

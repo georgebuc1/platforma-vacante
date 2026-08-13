@@ -110,6 +110,14 @@ export function getBadge(offer: Offer): { label: string; variant: 'good' | 'low'
   return null;
 }
 
+export function getScoreLabel(score: number): string {
+  if (score >= 9) return 'Excepțional';
+  if (score >= 8) return 'Excelent';
+  if (score >= 7) return 'Foarte bine';
+  if (score >= 6) return 'Bine';
+  return 'Satisfăcător';
+}
+
 export function getUniqueCountries(offers: Offer[]): string[] {
   return Array.from(new Set(offers.map((o) => o.country))).sort();
 }

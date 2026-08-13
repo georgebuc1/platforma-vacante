@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Save, Eye, Send, Trash2, ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { Save, Eye, Send, Trash2, ArrowLeft, Loader2, RefreshCw, Wand2 } from 'lucide-react';
 import { getOfferById, saveOffer, deleteOffer, getExistingSlugs } from '@/services/storageService';
 import { deleteOfferImage } from '@/services/imageService';
 import { showToast } from '@/components/common/Toast';
@@ -9,6 +9,13 @@ import ImageUploader from '@/components/admin/ImageUploader';
 import { calculateTotalPrice, calculateDurationDays, calculateDurationNights } from '@/utils/pricing';
 import { generateSlug, validateSlug, ensureUniqueSlug } from '@/utils/slugify';
 import { DEPARTURE_CITIES, TRIP_TYPES } from '@/components/search/SearchForm';
+import {
+  BOOKING_PROVIDER_NAME,
+  buildBookingAffiliateUrl,
+  isBookingComUrl,
+  getStoredAffiliateId,
+  saveStoredAffiliateId,
+} from '@/utils/affiliate';
 import type {
   Offer, OfferStatus, Currency, PriceType, TransportType, MealType, StopsType, TripType,
 } from '@/types';
@@ -60,6 +67,11 @@ export default function AdminOfferForm() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [slugEdited, setSlugEdited] = useState(isEdit);
+
+  // Booking.com affiliate link builder
+  const [bookingPropertyUrl, setBookingPropertyUrl] = useState('');
+  const [bookingAid, setBookingAid] = useState(getStoredAffiliateId());
+  const [bookingLabel, setBookingLabel] = useState('vacantamea');
 
   // Load existing offer when editing
   useEffect(() => {
@@ -212,6 +224,37 @@ export default function AdminOfferForm() {
     const mainImage = images[0] || '';
     const gallery = images.slice(1);
     setOffer((o) => ({ ...o, main_image_url: mainImage, gallery_images: gallery }));
+  };
+
+  const applyBookingPreset = () => {
+    setOffer((o) => ({ ...o, provider_name: BOOKING_PROVIDER_NAME, is_affiliate_link: true }));
+  };
+
+  const generateBookingAffiliateLink = () => {
+    if (!bookingPropertyUrl.trim()) {
+      showToast('Lipește mai întâi linkul către proprietatea de pe Booking.com.', 'error');
+      return;
+    }
+    if (!isBookingComUrl(bookingPropertyUrl)) {
+      showToast('Linkul introdus nu pare să fie de pe booking.com. Verifică-l.', 'error');
+      return;
+    }
+    if (!bookingAid.trim()) {
+      showToast('Introdu ID-ul tău de afiliat Booking.com (aid).', 'error');
+      return;
+    }
+
+    const affiliateUrl = buildBookingAffiliateUrl(bookingPropertyUrl, bookingAid, bookingLabel);
+
+    setOffer((o) => ({
+      ...o,
+      offer_url: affiliateUrl,
+      provider_name: BOOKING_PROVIDER_NAME,
+      is_affiliate_link: true,
+    }));
+
+    saveStoredAffiliateId(bookingAid);
+    showToast('Link de afiliat Booking.com generat și salvat pe ofertă.', 'success');
   };
 
   const totalPreview = useMemo(() => calculateTotalPrice(offer), [offer]);
@@ -427,6 +470,103 @@ export default function AdminOfferForm() {
 
         {/* Section 6 */}
         <FormSection title="Furnizor" number={6}>
+
+          {/* Quick provider presets */}
+          <div>
+            <label className="label-field">Furnizor rapid</label>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={applyBookingPreset}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors ${
+                  offer.provider_name === BOOKING_PROVIDER_NAME
+                    ? 'border-navy-600 bg-navy-600 text-white'
+                    : 'border-slate-200 text-slate-600 hover:border-navy-300 hover:text-navy-700'
+                }`}
+              >
+                Booking.com
+              </button>
+              <button
+                type="button"
+                onClick={() => update('provider_name', '')}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:border-slate-300"
+              >
+                Alt furnizor
+              </button>
+            </div>
+          </div>
+
+          {/* Booking.com affiliate link builder — only relevant when provider is Booking.com */}
+          {offer.provider_name === BOOKING_PROVIDER_NAME && (
+            <div className="rounded-xl border border-navy-100 bg-navy-50 p-4 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-bold text-navy-700">
+                <Wand2 className="h-4 w-4" />
+                Generator link afiliat Booking.com
+              </div>
+
+              <p className="text-xs leading-relaxed text-navy-600">
+                Lipește linkul către hotelul/proprietatea de pe booking.com și ID-ul
+                tău de afiliat (aid) din Partner Hub. Se generează automat linkul
+                trackable pe care îl salvezi ca ofertă.
+              </p>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <label className="label-field !mb-1 !text-navy-700">Link proprietate Booking.com</label>
+                  <input
+                    type="url"
+                    value={bookingPropertyUrl}
+                    onChange={(e) => setBookingPropertyUrl(e.target.value)}
+                    className="input-field"
+                    placeholder="https://www.booking.com/hotel/..."
+                  />
+                </div>
+                <div>
+                  <label className="label-field !mb-1 !text-navy-700">ID afiliat (aid)</label>
+                  <input
+                    type="text"
+                    value={bookingAid}
+                    onChange={(e) => setBookingAid(e.target.value)}
+                    className="input-field"
+                    placeholder="Ex: 123456"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="label-field !mb-1 !text-navy-700">Label urmărire (opțional)</label>
+                <input
+                  type="text"
+                  value={bookingLabel}
+                  onChange={(e) => setBookingLabel(e.target.value)}
+                  className="input-field"
+                  placeholder="vacantamea"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={generateBookingAffiliateLink}
+                className="inline-flex items-center gap-2 rounded-lg bg-cta-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-cta-400"
+              >
+                <Wand2 className="h-4 w-4" />
+                Generează și aplică linkul
+              </button>
+
+              <p className="text-[11px] text-navy-500">
+                Nu ai încă un ID de afiliat? Îl obții după ce te înscrii în{' '}
+                <a
+                  href="https://www.booking.com/affiliate-program/v2/index.html"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  programul de afiliere Booking.com
+                </a>.
+              </p>
+            </div>
+          )}
+
           <FieldGroup>
             <Field label="Nume furnizor" required error={errors.provider_name}>
               <input type="text" value={offer.provider_name} onChange={(e) => update('provider_name', e.target.value)} className="input-field" placeholder="TravelDemo" />

@@ -59,7 +59,7 @@
   }
 
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500 shadow-sm hover:shadow-md px-5 py-3;
+    @apply btn bg-cta-500 text-white hover:bg-cta-400 focus:ring-cta-500 shadow-sm hover:shadow-md px-5 py-3;
   }
 
   .btn-secondary {

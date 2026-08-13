@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Plane, Star, MapPin } from 'lucide-react';
+import { Calendar, Clock, Plane, MapPin } from 'lucide-react';
 import type { Offer } from '@/types';
 import { formatPrice, formatDate, getOfferPrice } from '@/utils/pricing';
-import { getBadge } from '@/utils/filters';
+import { getBadge, getScoreLabel } from '@/utils/filters';
 import { TRIP_TYPE_LABELS } from '@/components/search/SearchForm';
 import { trackClick } from '@/services/storageService';
 import ImageCarousel from './ImageCarousel';
@@ -105,40 +105,6 @@ export default function OfferCard({ offer }: OfferCardProps) {
           </span>
         )}
 
-        {/* Score */}
-
-        <span
-          className="
-            absolute
-            top-3
-            right-3
-
-            badge
-
-            bg-white/95
-            text-slate-800
-
-            shadow-sm
-            backdrop-blur-sm
-
-            dark:bg-slate-950/90
-            dark:text-slate-100
-            dark:border
-            dark:border-slate-700/70
-          "
-        >
-          <Star
-            className="
-              h-3 w-3
-              fill-accent-500
-              text-accent-500
-            "
-          />
-
-          {(offer.offer_score || 0)
-            .toFixed(1)
-            .replace('.', ',')}
-        </span>
       </div>
 
       {/* =====================================================
@@ -181,27 +147,51 @@ export default function OfferCard({ offer }: OfferCardProps) {
           </span>
         </div>
 
-        {/* Title */}
+        {/* Title + Booking.com-style score badge */}
 
-        <h3
-          className="
-            font-bold
-            text-base
-            leading-snug
-            mb-3
-            line-clamp-2
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <h3
+            className="
+              font-bold
+              text-base
+              leading-snug
+              line-clamp-2
 
-            text-slate-900
-            dark:text-slate-100
+              text-slate-900
+              dark:text-slate-100
 
-            group-hover:text-brand-700
-            dark:group-hover:text-blue-400
+              group-hover:text-brand-700
+              dark:group-hover:text-blue-400
 
-            transition-colors
-          "
-        >
-          {offer.title}
-        </h3>
+              transition-colors
+            "
+          >
+            {offer.title}
+          </h3>
+
+          {offer.offer_score > 0 && (
+            <div className="flex shrink-0 items-center gap-1.5">
+              <div className="text-right">
+                <span className="block text-[11px] font-semibold leading-none text-slate-600 dark:text-slate-400">
+                  {getScoreLabel(offer.offer_score)}
+                </span>
+              </div>
+
+              <span
+                className="
+                  flex h-8 w-8 shrink-0
+                  items-center justify-center
+                  rounded-md rounded-br-none
+                  bg-navy-600
+                  text-sm font-extrabold text-white
+                  dark:bg-navy-500
+                "
+              >
+                {offer.offer_score.toFixed(1).replace('.', ',')}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* =================================================
             INFORMATION
@@ -328,7 +318,10 @@ export default function OfferCard({ offer }: OfferCardProps) {
 
           <span
             className="
-              btn-primary
+              btn
+
+              bg-cta-500
+              text-white
 
               text-sm
               px-4
@@ -336,6 +329,7 @@ export default function OfferCard({ offer }: OfferCardProps) {
 
               shadow-sm
 
+              group-hover:bg-cta-400
               group-hover:shadow-md
             "
           >

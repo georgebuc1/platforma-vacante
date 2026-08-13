@@ -57,37 +57,20 @@ export default function HomePage() {
     <div className="bg-white dark:bg-slate-950">
 
       {/* =========================================================
-          HERO
+          HERO — solid navy band, Booking.com style
       ========================================================= */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white dark:from-slate-950 dark:via-slate-950 dark:to-slate-900">
+      <section className="relative bg-navy-600 dark:bg-navy-900">
 
-        {/* Decorative background */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 -right-32 h-[420px] w-[420px] rounded-full bg-brand-100/60 blur-3xl dark:bg-brand-900/20" />
-
-          <div className="absolute top-56 -left-32 h-[320px] w-[320px] rounded-full bg-accent-100/40 blur-3xl dark:bg-accent-900/10" />
-
-          <div className="absolute bottom-0 left-1/2 h-40 w-[600px] -translate-x-1/2 rounded-full bg-brand-100/20 blur-3xl dark:bg-brand-900/10" />
-        </div>
-
-        <div className="container-page relative py-12 sm:py-16 lg:py-20">
+        <div className="container-page relative pt-8 pb-20 sm:pt-10 sm:pb-24 lg:pt-12 lg:pb-28">
 
           {/* Hero text */}
-          <div className="mx-auto max-w-4xl text-center">
+          <div className="max-w-3xl">
 
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm backdrop-blur dark:border-brand-800 dark:bg-slate-900/80 dark:text-brand-300">
-              <Star className="h-4 w-4 fill-brand-500 text-brand-500" />
-              <span>Găsește mai mult. Cheltuiește mai puțin.</span>
-            </div>
-
-            <h1 className="animate-slide-up text-4xl font-extrabold leading-[1.08] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl xl:text-7xl dark:text-white">
-              VACANȚĂ ÎN{' '}
-              <span className="text-brand-600 dark:text-brand-400">
-                BANII TĂI!
-              </span>
+            <h1 className="animate-slide-up text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-5xl">
+              Vacanță în banii tăi
             </h1>
 
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-300">
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-navy-100 sm:text-base">
               Spune-ne de unde pleci, cât vrei să cheltuiești și când vrei să
               călătorești. Noi îți găsim variantele care se potrivesc bugetului
               tău.
@@ -95,30 +78,53 @@ export default function HomePage() {
 
           </div>
 
-          {/* Search box */}
-          <div className="relative z-10 mx-auto mt-8 max-w-6xl animate-fade-in sm:mt-10">
+          {/* Quick category pills */}
+          <div className="mt-6 flex flex-wrap gap-2 animate-fade-in">
+            {[
+              { label: 'Mare', emoji: '🏖️' },
+              { label: 'Munte', emoji: '⛰️' },
+              { label: 'City-break', emoji: '🏙️' },
+              { label: 'All-inclusive', emoji: '🍹' },
+              { label: 'Weekend', emoji: '🧳' },
+            ].map((cat) => (
+              <Link
+                key={cat.label}
+                to="/oferte"
+                state={{ trip_type: cat.label === 'Mare' ? 'beach' : undefined }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:text-sm"
+              >
+                <span>{cat.emoji}</span>
+                {cat.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Search box — overlaps the navy band and the white section below */}
+        <div className="container-page relative z-10 -mt-14 pb-2 sm:-mt-16">
+          <div className="mx-auto max-w-6xl animate-fade-in">
             <SearchForm />
           </div>
 
           {/* Trust indicators */}
-          <div className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="mx-auto mt-5 flex max-w-3xl flex-wrap items-center justify-center gap-x-6 gap-y-2 pb-2 text-xs font-medium text-navy-100">
 
             <span className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-brand-500" />
+              <ShieldCheck className="h-4 w-4 text-white" />
               Fără costuri ascunse
             </span>
 
-            <span className="hidden h-4 w-px bg-slate-200 sm:block dark:bg-slate-700" />
+            <span className="hidden h-4 w-px bg-white/20 sm:block" />
 
             <span className="flex items-center gap-1.5">
-              <Zap className="h-4 w-4 text-brand-500" />
+              <Zap className="h-4 w-4 text-white" />
               Căutare simplă și rapidă
             </span>
 
-            <span className="hidden h-4 w-px bg-slate-200 sm:block dark:bg-slate-700" />
+            <span className="hidden h-4 w-px bg-white/20 sm:block" />
 
             <span className="flex items-center gap-1.5">
-              <Star className="h-4 w-4 text-accent-500" />
+              <Star className="h-4 w-4 text-white" />
               Oferte selectate
             </span>
 
@@ -130,7 +136,7 @@ export default function HomePage() {
       {/* =========================================================
           RECOMMENDED OFFERS
       ========================================================= */}
-      <section className="container-page py-14 sm:py-16 lg:py-20">
+      <section className="container-page py-10 sm:py-12 lg:py-14">
 
         <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
 

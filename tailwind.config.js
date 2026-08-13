@@ -25,6 +25,31 @@ export default {
           950: '#172554',
         },
 
+        /* Booking.com-inspired deep navy — used for header, hero, footer */
+        navy: {
+          50: '#eef3fb',
+          100: '#dbe6f7',
+          200: '#a9c2ea',
+          300: '#6f97d8',
+          400: '#3a6bc0',
+          500: '#1d4d9e',
+          600: '#0a3a80',
+          700: '#062c63',
+          800: '#042047',
+          900: '#031633',
+          950: '#020e22',
+        },
+
+        /* Booking.com bright CTA blue */
+        cta: {
+          50: '#e6f2fc',
+          100: '#cce6fa',
+          400: '#1e8ae0',
+          500: '#0071c2',
+          600: '#005fa3',
+          700: '#004c85',
+        },
+
         accent: {
           50: '#fff7ed',
           100: '#ffedd5',

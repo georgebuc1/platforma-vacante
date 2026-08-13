@@ -15,7 +15,7 @@ export default function Header() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-colors duration-300">
+    <header className="sticky top-0 z-50 bg-navy-600 dark:bg-navy-900 border-b border-navy-700/50 dark:border-navy-800 transition-colors duration-300">
       <div className="container-page">
         <div className="flex h-16 items-center justify-between gap-4">
 
@@ -25,11 +25,11 @@ export default function Header() {
             className="flex items-center gap-2 shrink-0"
             onClick={() => setMobileOpen(false)}
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600 text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-navy-700">
               <Plane className="h-5 w-5" />
             </span>
 
-            <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors">
+            <span className="text-lg font-extrabold tracking-tight text-white transition-colors">
               Vacanța Mea
             </span>
           </Link>
@@ -44,8 +44,8 @@ export default function Header() {
                 className={({ isActive }) =>
                   `px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                     isActive
-                      ? 'text-brand-700 bg-brand-50 dark:text-brand-300 dark:bg-brand-950/60'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
+                      ? 'text-white bg-white/15'
+                      : 'text-navy-100 hover:text-white hover:bg-white/10'
                   }`
                 }
               >
@@ -60,7 +60,7 @@ export default function Header() {
             {/* CTA */}
             <button
               onClick={() => navigate('/oferte')}
-              className="hidden sm:inline-flex btn-primary text-sm px-4 py-2.5"
+              className="hidden sm:inline-flex btn bg-cta-500 text-white hover:bg-cta-400 focus:ring-cta-500 shadow-sm hover:shadow-md px-4 py-2.5 text-sm"
             >
               <Search className="h-4 w-4" />
               Găsește-mi vacanța
@@ -72,7 +72,7 @@ export default function Header() {
             {/* Mobile menu toggle */}
             <button
               type="button"
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+              className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Meniu"
             >
@@ -89,7 +89,7 @@ export default function Header() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 animate-fade-in transition-colors duration-300">
+        <div className="md:hidden border-t border-navy-700/50 bg-navy-600 dark:bg-navy-900 animate-fade-in transition-colors duration-300">
 
           <nav className="container-page py-3 flex flex-col gap-1">
 
@@ -102,8 +102,8 @@ export default function Header() {
                 className={({ isActive }) =>
                   `px-4 py-3 rounded-lg text-sm font-semibold transition-colors ${
                     isActive
-                      ? 'text-brand-700 bg-brand-50 dark:text-brand-300 dark:bg-brand-950/60'
-                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
+                      ? 'text-white bg-white/15'
+                      : 'text-navy-100 hover:bg-white/10'
                   }`
                 }
               >
@@ -112,8 +112,8 @@ export default function Header() {
             ))}
 
             {/* Mobile theme toggle */}
-            <div className="flex items-center justify-between px-4 py-3 mt-1 border-t border-slate-100 dark:border-slate-800">
-              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <div className="flex items-center justify-between px-4 py-3 mt-1 border-t border-navy-700/50">
+              <span className="text-sm font-semibold text-navy-100">
                 Temă site
               </span>
 
@@ -126,7 +126,7 @@ export default function Header() {
                 setMobileOpen(false);
                 navigate('/oferte');
               }}
-              className="btn-primary mt-2"
+              className="btn bg-cta-500 text-white hover:bg-cta-400 focus:ring-cta-500 mt-2 w-full"
             >
               <Search className="h-4 w-4" />
               Găsește-mi vacanța
