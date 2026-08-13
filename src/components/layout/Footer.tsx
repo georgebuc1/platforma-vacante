@@ -90,15 +90,6 @@ export default function Footer() {
                 <Mail className="h-4 w-4 shrink-0" />
                 contact@vacantamea.ro
               </li>
-
-              <li>
-                <Link
-                  to="/admin"
-                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
-                >
-                  Admin Panel
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
