@@ -9,6 +9,9 @@ import OfferDetailsPage from '@/pages/OfferDetailsPage';
 import AlertsPage from '@/pages/AlertsPage';
 import AboutPage from '@/pages/AboutPage';
 import ContactPage from '@/pages/ContactPage';
+import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
+import CookiesPage from '@/pages/CookiesPage';
+import AffiliateDisclosurePage from '@/pages/AffiliateDisclosurePage';
 import LoginPage from '@/pages/LoginPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminOffersList from '@/pages/admin/AdminOffersList';
@@ -27,6 +30,9 @@ export default function App() {
           <Route path="/alerte" element={<AlertsPage />} />
           <Route path="/despre" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/confidentialitate" element={<PrivacyPolicyPage />} />
+          <Route path="/cookies" element={<CookiesPage />} />
+          <Route path="/afiliere" element={<AffiliateDisclosurePage />} />
         </Route>
 
         {/* Login */}

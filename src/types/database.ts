@@ -29,6 +29,11 @@ export interface Database {
         Insert: Partial<DbAdminAccessLogRow>;
         Update: Partial<DbAdminAccessLogRow>;
       };
+      contact_messages: {
+        Row: DbContactMessageRow;
+        Insert: Partial<DbContactMessageRow>;
+        Update: Partial<DbContactMessageRow>;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -127,6 +132,15 @@ export interface DbClickRow {
   offer_slug: string;
   action: string;
   timestamp: string;
+}
+
+export interface DbContactMessageRow {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  consent: boolean;
+  created_at: string;
 }
 
 export interface DbAdminAccessLogRow {

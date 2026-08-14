@@ -90,6 +90,7 @@ export interface SearchFilters {
   transport_type?: string;
   min_score?: number;
   sort?: SortOption;
+  currency?: Currency;
 }
 
 export type SortOption = 'recommended' | 'price_asc' | 'price_desc' | 'score' | 'newest';
@@ -131,5 +132,6 @@ export interface ContactMessage {
   name: string;
   email: string;
   message: string;
+  consent: boolean;
   created_at: string;
 }

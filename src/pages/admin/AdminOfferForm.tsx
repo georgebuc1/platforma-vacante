@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Save, Eye, Send, Trash2, ArrowLeft, Loader2, RefreshCw, Wand2 } from 'lucide-react';
 import { getOfferById, saveOffer, deleteOffer, getExistingSlugs } from '@/services/storageService';
-import { deleteOfferImage } from '@/services/imageService';
+import { deleteOfferImages } from '@/services/imageService';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import ImageUploader from '@/components/admin/ImageUploader';
@@ -110,7 +110,8 @@ export default function AdminOfferForm() {
       ...o,
       duration_days: days,
       duration_nights: nights,
-      number_of_nights: o.accommodation_included ? nights : o.number_of_nights,
+      number_of_nights: o.accommodation_included ? nights : 0,
+      accommodation_price: o.accommodation_included ? o.accommodation_price : 0,
       total_price: total,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -208,9 +209,7 @@ export default function AdminOfferForm() {
     setDeleting(true);
     try {
       await deleteOffer(id);
-      if (offer.main_image_url) {
-        await deleteOfferImage(offer.main_image_url);
-      }
+      await deleteOfferImages([offer.main_image_url, ...(offer.gallery_images || [])]);
       showToast('Oferta a fost ștearsă.', 'success');
       navigate('/admin/oferte');
     } catch {

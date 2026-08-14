@@ -54,11 +54,14 @@ export function filterOffers(offers: Offer[], filters: SearchFilters): Offer[] {
   return offers.filter((offer) => {
     if (offer.status !== 'active') return false;
 
-    if (filters.departure_city && filters.departure_city !== 'orice' && offer.departure_city !== filters.departure_city) {
+    if (filters.departure_city && filters.departure_city !== 'orice' && filters.departure_city !== 'Orice aeroport' && offer.departure_city !== filters.departure_city) {
       return false;
     }
 
+    if (filters.currency && offer.currency !== filters.currency) return false;
+
     if (filters.max_budget && filters.max_budget > 0) {
+      if (offer.currency !== (filters.currency || offer.currency)) return false;
       if (getOfferPrice(offer) > filters.max_budget) return false;
     }
 

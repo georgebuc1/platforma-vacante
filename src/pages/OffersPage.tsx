@@ -37,6 +37,7 @@ export default function OffersPage() {
   const [filters, setFilters] = useState<SearchFilters>({
     departure_city: initialFilters.departure_city || 'orice',
     max_budget: initialFilters.max_budget || undefined,
+    currency: initialFilters.currency,
     month: initialFilters.month || 'oricand',
     duration: initialFilters.duration || 'orice',
     trip_type: initialFilters.trip_type || 'orice',
@@ -75,11 +76,10 @@ export default function OffersPage() {
     });
   }
 
+  if (filters.currency) { activeChips.push({ key: 'currency', label: filters.currency }); }
+
   if (filters.max_budget) {
-    activeChips.push({
-      key: 'max_budget',
-      label: `Până la ${filters.max_budget.toLocaleString('ro-RO')} RON`,
-    });
+    activeChips.push({ key: 'max_budget', label: `Până la ${filters.max_budget.toLocaleString('ro-RO')} ${filters.currency || ''}`.trim() });
   }
 
   if (filters.month && filters.month !== 'oricand') {
@@ -131,6 +131,7 @@ export default function OffersPage() {
     const defaults: Record<string, string | number | undefined> = {
       departure_city: 'orice',
       max_budget: undefined,
+      currency: undefined,
       month: 'oricand',
       duration: 'orice',
       trip_type: 'orice',
@@ -149,6 +150,7 @@ export default function OffersPage() {
     setFilters({
       departure_city: 'orice',
       max_budget: undefined,
+      currency: undefined,
       month: 'oricand',
       duration: 'orice',
       trip_type: 'orice',

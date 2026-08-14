@@ -5,9 +5,9 @@
  */
 
 import { supabase } from '@/lib/supabase';
-import type { DbOfferRow, DbAlertRow, DbClickRow, DbAdminAccessLogRow } from '@/types/database';
+import type { DbOfferRow, DbAlertRow, DbClickRow, DbAdminAccessLogRow, DbContactMessageRow } from '@/types/database';
 import type {
-  Offer, Alert, ClickEvent, AdminAccessLogEntry,
+  Offer, Alert, ClickEvent, AdminAccessLogEntry, ContactMessage,
   TripType, TransportType, MealType, StopsType,
   OfferStatus, Currency, PriceType, AlertFrequency, AlertStatus,
 } from '@/types';
@@ -324,6 +324,31 @@ export async function getClicksByOffer(offerId: string): Promise<number> {
   if (isNaN(numId)) return 0;
   const { count } = await supabase.from('clicks').select('*', { count: 'exact', head: true }).eq('offer_id', numId);
   return count ?? 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONTACT MESSAGES
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function saveContactMessage(input: Omit<ContactMessage, 'id' | 'created_at'>): Promise<ContactMessage> {
+  const { data, error } = await supabase.from('contact_messages').insert({
+    name: input.name.trim(), email: input.email.trim().toLowerCase(), message: input.message.trim(), consent: input.consent,
+  } as Partial<DbContactMessageRow>).select().maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error('Mesajul nu a putut fi salvat.');
+  const row = data as DbContactMessageRow;
+  return { id: row.id, name: row.name, email: row.email, message: row.message, consent: row.consent, created_at: row.created_at };
+}
+
+export async function getContactMessages(): Promise<ContactMessage[]> {
+  const { data, error } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(100);
+  if (error) { console.error('getContactMessages:', error.message); return []; }
+  return (data as DbContactMessageRow[] ?? []).map((row) => ({ id: row.id, name: row.name, email: row.email, message: row.message, consent: row.consent, created_at: row.created_at }));
+}
+
+export async function deleteContactMessage(id: string): Promise<void> {
+  const { error } = await supabase.from('contact_messages').delete().eq('id', id);
+  if (error) throw new Error(error.message);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

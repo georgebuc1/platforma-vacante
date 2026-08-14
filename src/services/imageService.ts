@@ -104,13 +104,13 @@ export function extractStoragePath(publicUrl: string): string | null {
  * Delete an image from the offers bucket by its public URL.
  * Silently ignores errors (e.g. if the image was already deleted or is an external URL).
  */
+export async function deleteOfferImages(publicUrls: string[]): Promise<void> {
+  const paths = Array.from(new Set(publicUrls.map(extractStoragePath).filter((p): p is string => Boolean(p))));
+  if (paths.length === 0) return;
+  const { error } = await supabase.storage.from(BUCKET_NAME).remove(paths);
+  if (error) throw new Error(error.message);
+}
+
 export async function deleteOfferImage(publicUrl: string): Promise<void> {
-  const path = extractStoragePath(publicUrl);
-  if (!path) return;
-
-  const { error } = await supabase.storage.from(BUCKET_NAME).remove([path]);
-
-  if (error) {
-    console.error('Failed to delete image:', error.message);
-  }
+  await deleteOfferImages([publicUrl]);
 }

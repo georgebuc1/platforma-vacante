@@ -100,9 +100,11 @@ export default function Footer() {
             © {new Date().getFullYear()} Vacanța Mea. Toate drepturile rezervate.
           </p>
 
-          <p>
-            Versiune MVP — Date demo. Fără rezervări reale.
-          </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            <Link to="/confidentialitate" className="hover:text-white">Confidențialitate</Link>
+            <Link to="/cookies" className="hover:text-white">Cookies</Link>
+            <Link to="/afiliere" className="hover:text-white">Afiliere</Link>
+          </div>
         </div>
       </div>
     </footer>
