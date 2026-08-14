@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  TrendingUp, FileText, FileX, Layers, Bell, MousePointerClick, PlusCircle, Clock, Wallet, CalendarPlus,
+  TrendingUp, FileText, FileX, Layers, Bell, MousePointerClick, PlusCircle, Clock, Wallet, CalendarPlus, ShieldAlert,
 } from 'lucide-react';
-import { getOffers, getAlerts, getClicks } from '@/services/storageService';
+import { getOffers, getAlerts, getClicks, getAdminAccessLog } from '@/services/storageService';
 import { formatPrice, formatDate, formatDateShort } from '@/utils/pricing';
-import type { Offer, Alert, ClickEvent } from '@/types';
+import type { Offer, Alert, ClickEvent, AdminAccessLogEntry } from '@/types';
 
 export default function AdminDashboard() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [clicks, setClicks] = useState<ClickEvent[]>([]);
+  const [accessLog, setAccessLog] = useState<AdminAccessLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getOffers(), getAlerts(), getClicks()])
-      .then(([o, a, c]) => { setOffers(o); setAlerts(a); setClicks(c); })
+    Promise.all([getOffers(), getAlerts(), getClicks(), getAdminAccessLog(15)])
+      .then(([o, a, c, log]) => { setOffers(o); setAlerts(a); setClicks(c); setAccessLog(log); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -148,6 +149,43 @@ export default function AdminDashboard() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Security: admin access attempts */}
+      <div className="card p-5 mt-6">
+        <h2 className="font-bold text-slate-900 mb-1 flex items-center gap-2">
+          <ShieldAlert className="h-4 w-4 text-error-500" /> Încercări de acces la admin
+        </h2>
+        <p className="text-xs text-slate-400 mb-4">
+          Login-uri eșuate și accesări directe ale paginilor de admin fără autentificare.
+        </p>
+        {accessLog.length === 0 ? (
+          <p className="text-sm text-slate-400 py-4 text-center">
+            Nicio încercare suspectă înregistrată. 👍
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {accessLog.map((entry) => (
+              <div key={entry.id} className="flex items-center gap-3 text-sm py-2 border-b border-slate-50 last:border-0">
+                <span
+                  className={`badge ${
+                    entry.event_type === 'failed_login'
+                      ? 'bg-error-50 text-error-700'
+                      : 'bg-warning-50 text-warning-700'
+                  }`}
+                >
+                  {entry.event_type === 'failed_login' ? 'Login eșuat' : 'Acces neautorizat'}
+                </span>
+                <span className="flex-1 text-slate-600 truncate">
+                  {entry.event_type === 'failed_login'
+                    ? entry.email_attempted || '—'
+                    : entry.path || '—'}
+                </span>
+                <span className="text-xs text-slate-400 shrink-0">{formatDate(entry.created_at)}</span>
+              </div>
+            ))}
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { logUnauthorizedAccess } from '@/services/storageService';
 import type { Session } from '@supabase/supabase-js';
 
 const ADMIN_EMAIL = 'georgebuc1@gmail.com';
@@ -26,6 +27,15 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  // Log unauthorized access attempts as a side effect (not during render)
+  useEffect(() => {
+    if (loading) return;
+    const isAuthorized = !!session && session.user.email?.toLowerCase() === ADMIN_EMAIL;
+    if (!isAuthorized) {
+      logUnauthorizedAccess(location.pathname);
+    }
+  }, [loading, session, location.pathname]);
 
   if (loading) {
     return (

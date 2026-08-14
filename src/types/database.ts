@@ -24,6 +24,11 @@ export interface Database {
         Insert: Partial<DbClickRow>;
         Update: Partial<DbClickRow>;
       };
+      admin_access_log: {
+        Row: DbAdminAccessLogRow;
+        Insert: Partial<DbAdminAccessLogRow>;
+        Update: Partial<DbAdminAccessLogRow>;
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -122,4 +127,13 @@ export interface DbClickRow {
   offer_slug: string;
   action: string;
   timestamp: string;
+}
+
+export interface DbAdminAccessLogRow {
+  id: string;
+  event_type: 'failed_login' | 'unauthorized_access';
+  email_attempted: string | null;
+  path: string | null;
+  user_agent: string | null;
+  created_at: string;
 }

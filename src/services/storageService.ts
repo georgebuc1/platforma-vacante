@@ -5,9 +5,9 @@
  */
 
 import { supabase } from '@/lib/supabase';
-import type { DbOfferRow, DbAlertRow, DbClickRow } from '@/types/database';
+import type { DbOfferRow, DbAlertRow, DbClickRow, DbAdminAccessLogRow } from '@/types/database';
 import type {
-  Offer, Alert, ClickEvent,
+  Offer, Alert, ClickEvent, AdminAccessLogEntry,
   TripType, TransportType, MealType, StopsType,
   OfferStatus, Currency, PriceType, AlertFrequency, AlertStatus,
 } from '@/types';
@@ -324,4 +324,52 @@ export async function getClicksByOffer(offerId: string): Promise<number> {
   if (isNaN(numId)) return 0;
   const { count } = await supabase.from('clicks').select('*', { count: 'exact', head: true }).eq('offer_id', numId);
   return count ?? 0;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMIN ACCESS LOG
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Records a failed login attempt on /login. Insert-only for anon — never throws. */
+export async function logFailedLogin(emailAttempted: string): Promise<void> {
+  try {
+    await supabase.from('admin_access_log').insert({
+      event_type: 'failed_login',
+      email_attempted: emailAttempted,
+      user_agent: navigator.userAgent,
+    } as Partial<DbAdminAccessLogRow>);
+  } catch {
+    // Never let logging failures break the login flow
+  }
+}
+
+/** Records someone hitting a protected /admin/* route without a valid session. */
+export async function logUnauthorizedAccess(path: string): Promise<void> {
+  try {
+    await supabase.from('admin_access_log').insert({
+      event_type: 'unauthorized_access',
+      path,
+      user_agent: navigator.userAgent,
+    } as Partial<DbAdminAccessLogRow>);
+  } catch {
+    // Never let logging failures break navigation
+  }
+}
+
+/** Admin-only: fetch the most recent access-log entries. */
+export async function getAdminAccessLog(limit = 30): Promise<AdminAccessLogEntry[]> {
+  const { data, error } = await supabase
+    .from('admin_access_log')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) { console.error('getAdminAccessLog:', error.message); return []; }
+  return (data as DbAdminAccessLogRow[] ?? []).map((row): AdminAccessLogEntry => ({
+    id: row.id,
+    event_type: row.event_type,
+    email_attempted: row.email_attempted ?? undefined,
+    path: row.path ?? undefined,
+    user_agent: row.user_agent ?? undefined,
+    created_at: row.created_at,
+  }));
 }

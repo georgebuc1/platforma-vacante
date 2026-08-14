@@ -117,6 +117,15 @@ export interface ClickEvent {
   timestamp: string;
 }
 
+export interface AdminAccessLogEntry {
+  id: string;
+  event_type: 'failed_login' | 'unauthorized_access';
+  email_attempted?: string;
+  path?: string;
+  user_agent?: string;
+  created_at: string;
+}
+
 export interface ContactMessage {
   id: string;
   name: string;

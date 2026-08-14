@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Plane, Mail, Lock, Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 import { signIn } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { logFailedLogin } from '@/services/storageService';
 
 const ADMIN_EMAIL = 'georgebuc1@gmail.com';
 
@@ -47,6 +48,7 @@ export default function LoginPage() {
       if (email.toLowerCase() !== ADMIN_EMAIL) {
         await supabase.auth.signOut();
         setAuthError('Acest cont nu are privilegii de administrator.');
+        logFailedLogin(email);
         return;
       }
       const from = (location.state as { from?: string })?.from || '/admin';
@@ -54,6 +56,7 @@ export default function LoginPage() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Eroare la autentificare.';
       setAuthError(msg);
+      logFailedLogin(email);
     } finally {
       setSubmitting(false);
     }
