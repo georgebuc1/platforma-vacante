@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, FileText, PlusCircle, Bell, Menu, X, Plane, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, FileText, PlusCircle, Bell, MessageSquare, Menu, X, Plane, LogOut, ArrowLeft } from 'lucide-react';
 import { signOut } from '@/lib/auth';
 import { showToast } from '@/components/common/Toast';
 
@@ -9,6 +9,7 @@ const ADMIN_LINKS = [
   { to: '/admin/oferte', label: 'Oferte', icon: FileText },
   { to: '/admin/oferte/noua', label: 'Adaugă ofertă', icon: PlusCircle },
   { to: '/admin/alerte', label: 'Alerte', icon: Bell },
+  { to: '/admin/mesaje', label: 'Mesaje', icon: MessageSquare },
 ];
 
 export default function AdminLayout() {

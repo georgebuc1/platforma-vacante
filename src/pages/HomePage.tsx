@@ -14,6 +14,7 @@ import SearchForm from '@/components/search/SearchForm';
 import OfferCard from '@/components/offers/OfferCard';
 import { getOffers } from '@/services/storageService';
 import { sortOffers } from '@/utils/filters';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import type { Offer } from '@/types';
 
 const STEPS = [
@@ -41,6 +42,11 @@ const STEPS = [
 ];
 
 export default function HomePage() {
+  useDocumentMeta(
+    'Vacanță în banii tăi',
+    'Găsește vacanța potrivită în funcție de buget, perioadă și preferințele tale. Comparăm oferte de la furnizori de încredere, inclusiv Booking.com.'
+  );
+
   const [popularOffers, setPopularOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
 

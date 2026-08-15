@@ -1,4 +1,5 @@
 import { Sparkles, ShieldCheck, Heart } from 'lucide-react';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 
 const VALUES = [
   {
@@ -22,6 +23,11 @@ const VALUES = [
 ];
 
 export default function AboutPage() {
+  useDocumentMeta(
+    'Despre noi',
+    'Vacanța Mea este o platformă românească ce te ajută să găsești vacanța potrivită în funcție de buget, perioadă și preferințele tale.'
+  );
+
   return (
     <div className="container-page py-12">
       <div className="max-w-3xl mx-auto">

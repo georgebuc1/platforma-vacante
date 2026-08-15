@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SlidersHorizontal, X, Search } from 'lucide-react';
 import type { SearchFilters, SortOption, Offer } from '@/types';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { getOffers } from '@/services/storageService';
 import { filterOffers, sortOffers } from '@/utils/filters';
 import OfferCard from '@/components/offers/OfferCard';
@@ -26,6 +27,11 @@ const TRIP_LABELS: Record<string, string> = Object.fromEntries(
 );
 
 export default function OffersPage() {
+  useDocumentMeta(
+    'Oferte de vacanță',
+    'Filtrează oferte de vacanță după buget, oraș de plecare, tip de vacanță și transport. Găsește rapid oferta potrivită pentru tine.'
+  );
+
   const location = useLocation();
   const navigate = useNavigate();
 

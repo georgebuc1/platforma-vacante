@@ -1,22 +1,23 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  TrendingUp, FileText, FileX, Layers, Bell, MousePointerClick, PlusCircle, Clock, Wallet, CalendarPlus, ShieldAlert,
+  TrendingUp, FileText, FileX, Layers, Bell, MousePointerClick, PlusCircle, Clock, Wallet, CalendarPlus, ShieldAlert, MessageSquare,
 } from 'lucide-react';
-import { getOffers, getAlerts, getClicks, getAdminAccessLog } from '@/services/storageService';
+import { getOffers, getAlerts, getClicks, getAdminAccessLog, getContactMessages } from '@/services/storageService';
 import { formatPrice, formatDate, formatDateShort } from '@/utils/pricing';
-import type { Offer, Alert, ClickEvent, AdminAccessLogEntry } from '@/types';
+import type { Offer, Alert, ClickEvent, AdminAccessLogEntry, ContactMessage } from '@/types';
 
 export default function AdminDashboard() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [clicks, setClicks] = useState<ClickEvent[]>([]);
   const [accessLog, setAccessLog] = useState<AdminAccessLogEntry[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getOffers(), getAlerts(), getClicks(), getAdminAccessLog(15)])
-      .then(([o, a, c, log]) => { setOffers(o); setAlerts(a); setClicks(c); setAccessLog(log); })
+    Promise.all([getOffers(), getAlerts(), getClicks(), getAdminAccessLog(15), getContactMessages()])
+      .then(([o, a, c, log, m]) => { setOffers(o); setAlerts(a); setClicks(c); setAccessLog(log); setMessages(m); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -30,13 +31,14 @@ export default function AdminDashboard() {
   const recentClicks = [...clicks].slice(0, 10);
 
   const stats = [
-    { label: 'Total oferte', value: offers.length, icon: Layers, color: 'text-brand-600 bg-brand-50' },
-    { label: 'Oferte active', value: activeOffers.length, icon: FileText, color: 'text-success-600 bg-success-50' },
-    { label: 'Oferte inactive', value: inactiveOffers.length, icon: FileX, color: 'text-slate-600 bg-slate-100' },
+    { label: 'Total oferte', value: offers.length, icon: Layers, color: 'text-brand-600 bg-brand-50', to: '/admin/oferte' },
+    { label: 'Oferte active', value: activeOffers.length, icon: FileText, color: 'text-success-600 bg-success-50', to: '/admin/oferte' },
+    { label: 'Oferte inactive', value: inactiveOffers.length, icon: FileX, color: 'text-slate-600 bg-slate-100', to: '/admin/oferte' },
     { label: 'Preț mediu', value: `${formatPrice(avgPrice, 'RON')}`, icon: Wallet, color: 'text-accent-600 bg-accent-50' },
     { label: 'Ultima ofertă', value: lastOffer ? formatDateShort(lastOffer.created_at) : '—', icon: CalendarPlus, color: 'text-warning-600 bg-warning-50' },
-    { label: 'Oferte expirate', value: expiredOffers.length, icon: FileX, color: 'text-error-600 bg-error-50' },
-    { label: 'Alerte create', value: alerts.length, icon: Bell, color: 'text-accent-600 bg-accent-50' },
+    { label: 'Oferte expirate', value: expiredOffers.length, icon: FileX, color: 'text-error-600 bg-error-50', to: '/admin/oferte' },
+    { label: 'Alerte create', value: alerts.length, icon: Bell, color: 'text-accent-600 bg-accent-50', to: '/admin/alerte' },
+    { label: 'Mesaje contact', value: messages.length, icon: MessageSquare, color: 'text-brand-600 bg-brand-50', to: '/admin/mesaje' },
     { label: 'Clickuri totale', value: clicks.length, icon: MousePointerClick, color: 'text-slate-600 bg-slate-100' },
   ];
 
@@ -44,7 +46,7 @@ export default function AdminDashboard() {
     return (
       <div className="p-6 lg:p-8">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          {Array.from({ length: 8 }).map((_, i) => <div key={i} className="card p-5 h-24 animate-pulse bg-slate-100" />)}
+          {Array.from({ length: 9 }).map((_, i) => <div key={i} className="card p-5 h-24 animate-pulse bg-slate-100" />)}
         </div>
       </div>
     );
@@ -64,17 +66,24 @@ export default function AdminDashboard() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        {stats.map((stat) => (
-          <div key={stat.label} className="card p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.color}`}>
-                <stat.icon className="h-5 w-5" />
+        {stats.map((stat) => {
+          const CardTag = stat.to ? Link : 'div';
+          return (
+            <CardTag
+              key={stat.label}
+              {...(stat.to ? { to: stat.to } : {})}
+              className={`card p-5 ${stat.to ? 'hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer' : ''}`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.color}`}>
+                  <stat.icon className="h-5 w-5" />
+                </div>
               </div>
-            </div>
-            <div className="text-2xl font-extrabold text-slate-900">{stat.value}</div>
-            <div className="text-sm text-slate-500">{stat.label}</div>
-          </div>
-        ))}
+              <div className="text-2xl font-extrabold text-slate-900">{stat.value}</div>
+              <div className="text-sm text-slate-500">{stat.label}</div>
+            </CardTag>
+          );
+        })}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

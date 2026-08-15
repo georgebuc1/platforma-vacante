@@ -17,6 +17,7 @@ import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminOffersList from '@/pages/admin/AdminOffersList';
 import AdminOfferForm from '@/pages/admin/AdminOfferForm';
 import AdminAlerts from '@/pages/admin/AdminAlerts';
+import AdminMessages from '@/pages/admin/AdminMessages';
 
 export default function App() {
   return (
@@ -52,6 +53,7 @@ export default function App() {
           <Route path="oferte/noua" element={<AdminOfferForm />} />
           <Route path="oferte/:id/edit" element={<AdminOfferForm />} />
           <Route path="alerte" element={<AdminAlerts />} />
+          <Route path="mesaje" element={<AdminMessages />} />
         </Route>
       </Routes>
       <ToastContainer />

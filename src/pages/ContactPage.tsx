@@ -3,8 +3,11 @@ import { Link } from 'react-router-dom';
 import { Mail, User, MessageSquare, Send, CheckCircle } from 'lucide-react';
 import { showToast } from '@/components/common/Toast';
 import { saveContactMessage } from '@/services/storageService';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 
 export default function ContactPage() {
+  useDocumentMeta('Contact', 'Ai întrebări sau sugestii despre Vacanța Mea? Scrie-ne și îți răspundem cât mai curând.');
+
   const [name, setName] = useState(''); const [email, setEmail] = useState(''); const [message, setMessage] = useState(''); const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({}); const [sent, setSent] = useState(false); const [submitting, setSubmitting] = useState(false);
   const validate = () => { const errs: Record<string,string> = {}; if (!name.trim()) errs.name='Acest câmp este obligatoriu.'; if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email='Introdu un email valid.'; if (!message.trim()) errs.message='Acest câmp este obligatoriu.'; if (!consent) errs.consent='Este necesar acordul pentru prelucrarea datelor.'; setErrors(errs); return Object.keys(errs).length===0; };

@@ -18,6 +18,7 @@ import {
   TRIP_TYPES,
 } from '@/components/search/SearchForm';
 import { showToast } from '@/components/common/Toast';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import type { AlertFrequency } from '@/types';
 
 const FREQUENCIES: { value: AlertFrequency; label: string }[] = [
@@ -27,6 +28,11 @@ const FREQUENCIES: { value: AlertFrequency; label: string }[] = [
 ];
 
 export default function AlertsPage() {
+  useDocumentMeta(
+    'Alertă de preț',
+    'Primești un email automat de îndată ce apare o ofertă de vacanță care se încadrează în bugetul și preferințele tale.'
+  );
+
   const [email, setEmail] = useState('');
   const [departureCity, setDepartureCity] = useState('București');
   const [maxBudget, setMaxBudget] = useState('2500');
