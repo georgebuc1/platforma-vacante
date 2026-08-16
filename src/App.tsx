@@ -16,6 +16,7 @@ import LoginPage from '@/pages/LoginPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminOffersList from '@/pages/admin/AdminOffersList';
 import AdminOfferForm from '@/pages/admin/AdminOfferForm';
+import AdminOfferImport from '@/pages/admin/AdminOfferImport';
 import AdminAlerts from '@/pages/admin/AdminAlerts';
 import AdminMessages from '@/pages/admin/AdminMessages';
 
@@ -51,6 +52,7 @@ export default function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="oferte" element={<AdminOffersList />} />
           <Route path="oferte/noua" element={<AdminOfferForm />} />
+          <Route path="oferte/import" element={<AdminOfferImport />} />
           <Route path="oferte/:id/edit" element={<AdminOfferForm />} />
           <Route path="alerte" element={<AdminAlerts />} />
           <Route path="mesaje" element={<AdminMessages />} />

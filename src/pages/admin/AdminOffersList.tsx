@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, PlusCircle, Edit, Trash2, Eye, Archive, CheckCircle, XCircle, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, PlusCircle, Upload, Edit, Trash2, Eye, Archive, CheckCircle, XCircle, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 import { getOffers, deleteOffer, updateOffer } from '@/services/storageService';
 import { deleteOfferImage } from '@/services/imageService';
 import { formatPrice, formatDateShort } from '@/utils/pricing';
@@ -124,9 +124,14 @@ export default function AdminOffersList() {
           <h1 className="text-2xl font-extrabold text-slate-900">Oferte</h1>
           <p className="text-slate-500 text-sm mt-1">{filtered.length} din {offers.length} oferte</p>
         </div>
-        <Link to="/admin/oferte/noua" className="btn-primary text-sm">
-          <PlusCircle className="h-4 w-4" /> Adaugă ofertă
-        </Link>
+        <div className="flex gap-2">
+          <Link to="/admin/oferte/import" className="btn text-sm border border-slate-200 hover:bg-slate-50">
+            <Upload className="h-4 w-4" /> Import CSV
+          </Link>
+          <Link to="/admin/oferte/noua" className="btn-primary text-sm">
+            <PlusCircle className="h-4 w-4" /> Adaugă ofertă
+          </Link>
+        </div>
       </div>
 
       {/* Search + Filters */}
