@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, PlusCircle, Upload, Edit, Trash2, Eye, Archive, CheckCircle, XCircle, Loader2, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Search, PlusCircle, Upload, Edit, Trash2, Eye, Archive, CheckCircle, XCircle, Loader2, SlidersHorizontal, ArrowUpDown, Share2 } from 'lucide-react';
 import { getOffers, deleteOffer, updateOffer } from '@/services/storageService';
 import { deleteOfferImage } from '@/services/imageService';
 import { formatPrice, formatDateShort } from '@/utils/pricing';
+import { buildSocialCaption, copyToClipboard } from '@/utils/socialCaption';
 import { showToast } from '@/components/common/Toast';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 import Pagination from '@/components/common/Pagination';
@@ -92,6 +93,16 @@ export default function AdminOffersList() {
 
   const [deleteTarget, setDeleteTarget] = useState<Offer | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const handleCopySocialText = async (offer: Offer) => {
+    const caption = buildSocialCaption(offer);
+    const success = await copyToClipboard(caption);
+    if (success) {
+      showToast('Text copiat! Gata de lipit pe Facebook/Instagram.', 'success');
+    } else {
+      showToast('Nu am putut copia automat — selectează și copiază manual.', 'error');
+    }
+  };
 
   const confirmDelete = async () => {
     if (!deleteTarget) return;
@@ -227,6 +238,7 @@ export default function AdminOffersList() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <Link to={`/oferte/${offer.slug}`} target="_blank" className="p-2 rounded-lg text-slate-500 hover:bg-slate-100" title="Vezi"><Eye className="h-4 w-4" /></Link>
+                        <button onClick={() => handleCopySocialText(offer)} className="p-2 rounded-lg text-slate-500 hover:bg-slate-100" title="Copiază text pentru social media"><Share2 className="h-4 w-4" /></button>
                         <Link to={`/admin/oferte/${offer.id}/edit`} className="p-2 rounded-lg text-brand-600 hover:bg-brand-50" title="Editează"><Edit className="h-4 w-4" /></Link>
                         {offer.status !== 'active' && <button onClick={() => handleStatusChange(offer.id, 'active')} className="p-2 rounded-lg text-success-600 hover:bg-success-50" title="Publică"><CheckCircle className="h-4 w-4" /></button>}
                         {offer.status !== 'expired' && <button onClick={() => handleStatusChange(offer.id, 'expired')} className="p-2 rounded-lg text-error-600 hover:bg-error-50" title="Marchează expirată"><XCircle className="h-4 w-4" /></button>}
@@ -257,6 +269,7 @@ export default function AdminOffersList() {
                 <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
                   <Link to={`/admin/oferte/${offer.id}/edit`} className="btn-ghost text-xs py-2"><Edit className="h-3.5 w-3.5" /> Editează</Link>
                   <Link to={`/oferte/${offer.slug}`} target="_blank" className="btn-ghost text-xs py-2"><Eye className="h-3.5 w-3.5" /> Vezi</Link>
+                  <button onClick={() => handleCopySocialText(offer)} className="btn-ghost text-xs py-2"><Share2 className="h-3.5 w-3.5" /> Copiază</button>
                   {offer.status !== 'active' && <button onClick={() => handleStatusChange(offer.id, 'active')} className="btn-ghost text-xs py-2 text-success-600"><CheckCircle className="h-3.5 w-3.5" /> Publică</button>}
                   <button onClick={() => setDeleteTarget(offer)} className="btn-ghost text-xs py-2 text-error-600"><Trash2 className="h-3.5 w-3.5" /> Șterge</button>
                 </div>
