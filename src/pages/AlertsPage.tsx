@@ -19,6 +19,7 @@ import {
 } from '@/components/search/SearchForm';
 import { showToast } from '@/components/common/Toast';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
+import { useHoneypot } from '@/hooks/useHoneypot';
 import type { AlertFrequency } from '@/types';
 
 const FREQUENCIES: { value: AlertFrequency; label: string }[] = [
@@ -45,6 +46,7 @@ export default function AlertsPage() {
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const { isBot, honeypotFieldProps } = useHoneypot();
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -77,6 +79,20 @@ export default function AlertsPage() {
     e.preventDefault();
 
     if (!validate()) return;
+
+    // Silently drop bot submissions — show normal success so bots don't
+    // learn the check exists, but never touch the database.
+    if (isBot()) {
+      showToast('Alerta ta a fost creată cu succes.', 'success');
+      setEmail('');
+      setCountry('');
+      setTripType('orice');
+      setMonth('oricand');
+      setDuration('orice');
+      setFrequency('immediate');
+      setConsent(false);
+      return;
+    }
 
     setSubmitting(true);
 
@@ -140,6 +156,8 @@ export default function AlertsPage() {
           onSubmit={handleSubmit}
           className="card p-6 sm:p-8 space-y-5"
         >
+          {/* Honeypot — invisible to real people, catches simple bots */}
+          <input type="text" {...honeypotFieldProps} />
 
           {/* Email */}
           <div>

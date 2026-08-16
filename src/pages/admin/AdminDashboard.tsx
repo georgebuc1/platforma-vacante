@@ -67,13 +67,8 @@ export default function AdminDashboard() {
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         {stats.map((stat) => {
-          const CardTag = stat.to ? Link : 'div';
-          return (
-            <CardTag
-              key={stat.label}
-              {...(stat.to ? { to: stat.to } : {})}
-              className={`card p-5 ${stat.to ? 'hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer' : ''}`}
-            >
+          const cardContent = (
+            <>
               <div className="flex items-center justify-between mb-3">
                 <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.color}`}>
                   <stat.icon className="h-5 w-5" />
@@ -81,7 +76,21 @@ export default function AdminDashboard() {
               </div>
               <div className="text-2xl font-extrabold text-slate-900">{stat.value}</div>
               <div className="text-sm text-slate-500">{stat.label}</div>
-            </CardTag>
+            </>
+          );
+
+          return stat.to ? (
+            <Link
+              key={stat.label}
+              to={stat.to}
+              className="card p-5 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              {cardContent}
+            </Link>
+          ) : (
+            <div key={stat.label} className="card p-5">
+              {cardContent}
+            </div>
           );
         })}
       </div>
