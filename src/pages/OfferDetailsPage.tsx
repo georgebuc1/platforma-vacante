@@ -41,7 +41,7 @@ export default function OfferDetailsPage() {
   const tripTypeLabel = offer.trip_types?.[0] ? TRIP_TYPE_LABELS[offer.trip_types[0]] || '' : '';
   const price = offer.total_price || 0;
   const includedItems = buildIncludedItems(offer);
-  const mealLabels: Record<MealType, string> = { fara_masa: 'Fără masă', mic_dejun: 'Mic dejun', demipensiune: 'Demipensiune', pensiune_completa: 'Pensiune completă', all_inclusive: 'All Inclusive' };
+  const mealLabels: Record<MealType, string> = { fara_masa: 'Fără masă', mic_dejun: 'Mic dejun', demipensiune: 'Demipensiune', pensiune_completa: 'Pensiune completă', all_inclusive: 'All Inclusive' ,ultra_all_inclusive: 'Ultra All Inclusive', };
   const transportLabels: Record<TransportType, string> = { avion: 'Avion', autocar: 'Autocar', masina: 'Mașină', tren: 'Tren', avion_transfer: 'Avion + transfer' };
   const previousImage = () => setActiveImage((current) => current === 0 ? gallery.length - 1 : current - 1);
   const nextImage = () => setActiveImage((current) => current === gallery.length - 1 ? 0 : current + 1);

@@ -15,7 +15,8 @@ export type MealType =
   | 'mic_dejun'
   | 'demipensiune'
   | 'pensiune_completa'
-  | 'all_inclusive';
+  | 'all_inclusive'
+  | 'ultra_all_inclusive';
 
 export type StopsType = 'direct' | 'o_escala' | 'mai_multe_escale';
 

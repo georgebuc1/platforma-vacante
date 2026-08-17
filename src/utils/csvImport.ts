@@ -55,7 +55,7 @@ const REQUIRED_COLUMNS = [
 
 const VALID_TRIP_TYPES: TripType[] = ['beach', 'city_break', 'mountain', 'all_inclusive', 'family', 'romantic', 'adventure', 'weekend'];
 const VALID_TRANSPORT: TransportType[] = ['avion', 'autocar', 'masina', 'tren', 'avion_transfer'];
-const VALID_MEAL: MealType[] = ['fara_masa', 'mic_dejun', 'demipensiune', 'pensiune_completa', 'all_inclusive'];
+const VALID_MEAL: MealType[] = ['fara_masa', 'mic_dejun', 'demipensiune', 'pensiune_completa', 'all_inclusive', 'ultra_all_inclusive',];
 const VALID_CURRENCY: Currency[] = ['RON', 'EUR'];
 const VALID_PRICE_TYPE: PriceType[] = ['per_person', 'total'];
 const VALID_STATUS: OfferStatus[] = ['draft', 'active'];
