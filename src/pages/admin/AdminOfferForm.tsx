@@ -294,7 +294,7 @@ export default function AdminOfferForm() {
               </div>
               {offer.slug && (
                 <p className="mt-2 text-xs text-slate-400">
-                  URL final: <span className="text-brand-600 font-medium">https://ofertevacante.netlify.app/oferte/{offer.slug}</span>
+                  URL final: <span className="text-brand-600 font-medium">https://vacanta-mea.ro/oferte/{offer.slug}</span>
                 </p>
               )}
             </Field>

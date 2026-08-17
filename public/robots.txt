@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /login
 
-Sitemap: https://ofertevacante.netlify.app/sitemap.xml
+Sitemap: https://vacanta-mea.ro/sitemap.xml

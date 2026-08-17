@@ -12,7 +12,7 @@ const TRIP_TYPE_EMOJI: Record<string, string> = {
   weekend: '🧳',
 };
 
-const SITE_ORIGIN = 'https://ofertevacante.netlify.app';
+const SITE_ORIGIN = 'https://vacanta-mea.ro';
 
 /**
  * Builds a ready-to-copy social media caption for an offer — short, with
