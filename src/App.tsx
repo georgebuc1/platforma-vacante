@@ -5,6 +5,10 @@ import ProtectedRoute from '@/components/admin/ProtectedRoute';
 import { ToastContainer } from '@/components/common/Toast';
 import HomePage from '@/pages/HomePage';
 import OffersPage from '@/pages/OffersPage';
+import BiletePage from '@/pages/BiletePage';
+import CazariPage from '@/pages/CazariPage';
+import RentACarPage from '@/pages/RentACarPage';
+import LastMinutePage from '@/pages/LastMinutePage';
 import OfferDetailsPage from '@/pages/OfferDetailsPage';
 import AlertsPage from '@/pages/AlertsPage';
 import AboutPage from '@/pages/AboutPage';
@@ -29,6 +33,10 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/oferte" element={<OffersPage />} />
           <Route path="/oferte/:slug" element={<OfferDetailsPage />} />
+          <Route path="/bilete" element={<BiletePage />} />
+          <Route path="/cazari" element={<CazariPage />} />
+          <Route path="/rent-a-car" element={<RentACarPage />} />
+          <Route path="/last-minute" element={<LastMinutePage />} />
           <Route path="/alerte" element={<AlertsPage />} />
           <Route path="/despre" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

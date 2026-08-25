@@ -81,6 +81,15 @@ export function filterOffers(offers: Offer[], filters: SearchFilters): Offer[] {
 
     if (filters.min_score && filters.min_score > 0 && (offer.offer_score || 0) < filters.min_score) return false;
 
+    if (filters.accommodation_only && !offer.accommodation_included) return false;
+
+    if (filters.last_minute) {
+      const now = new Date();
+      const dep = new Date(offer.departure_date);
+      const twoWeeksOut = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+      if (dep < now || dep > twoWeeksOut) return false;
+    }
+
     return true;
   });
 }

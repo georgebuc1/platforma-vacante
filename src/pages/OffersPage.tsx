@@ -26,16 +26,36 @@ const TRIP_LABELS: Record<string, string> = Object.fromEntries(
   TRIP_TYPES.map((t) => [t.value, t.label])
 );
 
-export default function OffersPage() {
+interface OffersPageProps {
+  /** Filters that define this page's category (e.g. transport_type: 'avion' for /bilete).
+   *  Applied as the baseline — location.state (from the hero search bar) can override them. */
+  presetFilters?: Partial<SearchFilters>;
+  pageTitle?: string;
+  pageSubtitle?: string;
+  emptyTitle?: string;
+  emptyMessage?: string;
+}
+
+export default function OffersPage({
+  presetFilters,
+  pageTitle = 'Oferte pentru vacanța ta',
+  pageSubtitle,
+  emptyTitle = 'Nu am găsit momentan o ofertă potrivită.',
+  emptyMessage = 'Încearcă să mărești bugetul sau să alegi o perioadă mai flexibilă.',
+}: OffersPageProps) {
   useDocumentMeta(
-    'Oferte de vacanță',
+    pageTitle,
     'Filtrează oferte de vacanță după buget, oraș de plecare, tip de vacanță și transport. Găsește rapid oferta potrivită pentru tine.'
   );
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const initialFilters = (location.state as SearchFilters) || {};
+  const stateFilters = (location.state as SearchFilters) || {};
+  // location.state (set by the hero search bar) takes priority over the
+  // page's own baseline preset, so a person searching "Cazări în Antalya"
+  // still lands on /cazari filtered correctly even without extra plumbing.
+  const initialFilters = { ...presetFilters, ...stateFilters };
 
   const [allOffers, setAllOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +68,10 @@ export default function OffersPage() {
     duration: initialFilters.duration || 'orice',
     trip_type: initialFilters.trip_type || 'orice',
     country: 'orice',
-    destination: 'orice',
-    transport_type: 'orice',
+    destination: initialFilters.destination || 'orice',
+    transport_type: initialFilters.transport_type || 'orice',
+    accommodation_only: initialFilters.accommodation_only,
+    last_minute: initialFilters.last_minute,
     min_score: 0,
     sort: 'recommended',
   });
@@ -161,13 +183,17 @@ export default function OffersPage() {
       duration: 'orice',
       trip_type: 'orice',
       country: 'orice',
-      destination: 'orice',
-      transport_type: 'orice',
+      destination: presetFilters?.destination || 'orice',
+      transport_type: presetFilters?.transport_type || 'orice',
+      accommodation_only: presetFilters?.accommodation_only,
+      last_minute: presetFilters?.last_minute,
       min_score: 0,
       sort: 'recommended',
     });
 
-    navigate('/oferte', { replace: true });
+    // Stay on the current category page (e.g. /cazari) rather than always
+    // bouncing back to the generic /oferte listing.
+    navigate(location.pathname, { replace: true });
   };
 
   return (
@@ -177,8 +203,12 @@ export default function OffersPage() {
         {/* Page heading */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">
-            Oferte pentru vacanța ta
+            {pageTitle}
           </h1>
+
+          {pageSubtitle && (
+            <p className="mt-1 text-slate-500 dark:text-slate-400">{pageSubtitle}</p>
+          )}
 
           <p className="mt-1 text-slate-500 dark:text-slate-400">
             {loading
@@ -354,7 +384,7 @@ export default function OffersPage() {
                     mb-2
                   "
                 >
-                  Nu am găsit momentan o ofertă potrivită.
+                  {emptyTitle}
                 </h3>
 
                 <p
@@ -364,7 +394,7 @@ export default function OffersPage() {
                     mb-6
                   "
                 >
-                  Încearcă să mărești bugetul sau să alegi o perioadă mai flexibilă.
+                  {emptyMessage}
                 </p>
 
                 <button

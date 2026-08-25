@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Zap,
 } from 'lucide-react';
-import SearchForm from '@/components/search/SearchForm';
+import HeroSearchBar from '@/components/search/HeroSearchBar';
 import OfferCard from '@/components/offers/OfferCard';
 import { getOffers } from '@/services/storageService';
 import { sortOffers } from '@/utils/filters';
@@ -109,7 +109,7 @@ export default function HomePage() {
         {/* Search box — overlaps the navy band and the white section below */}
         <div className="container-page relative z-10 -mt-14 pb-2 sm:-mt-16">
           <div className="mx-auto max-w-6xl animate-fade-in">
-            <SearchForm />
+            <HeroSearchBar />
           </div>
 
           {/* Trust indicators */}

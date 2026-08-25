@@ -91,6 +91,10 @@ export interface SearchFilters {
   min_score?: number;
   sort?: SortOption;
   currency?: Currency;
+  /** CAZĂRI tab: only offers where accommodation_included === true */
+  accommodation_only?: boolean;
+  /** LAST MINUTE tab: departure_date within the next 14 days (and not in the past) */
+  last_minute?: boolean;
 }
 
 export type SortOption = 'recommended' | 'price_asc' | 'price_desc' | 'score' | 'newest';

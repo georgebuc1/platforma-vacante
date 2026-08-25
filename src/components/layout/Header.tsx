@@ -4,10 +4,10 @@ import { Menu, X, Plane, Search } from 'lucide-react';
 import ThemeToggle from '@/components/common/ThemeToggle';
 
 const NAV_LINKS = [
-  { to: '/', label: 'Acasă' },
-  { to: '/oferte', label: 'Oferte' },
-  { to: '/alerte', label: 'Alerte' },
-  { to: '/despre', label: 'Despre noi' },
+  { to: '/bilete', label: 'Bilete' },
+  { to: '/cazari', label: 'Cazări' },
+  { to: '/rent-a-car', label: 'Rent a car' },
+  { to: '/last-minute', label: 'Last minute' },
 ];
 
 export default function Header() {
