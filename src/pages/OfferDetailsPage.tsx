@@ -11,6 +11,8 @@ import { showToast } from '@/components/common/Toast';
 import type { MealType, TransportType, Offer } from '@/types';
 import Lightbox from '@/components/offers/Lightbox';
 import { buildIncludedItems, getStopsLabel } from '@/utils/offerDetails';
+import KlookToursWidget from '@/components/widgets/KlookToursWidget';
+import { findKlookWidgetForDestination } from '@/data/klookWidgets';
 
 const BADGE_STYLES: Record<string, string> = {
   good: 'bg-success-100 text-success-700 dark:bg-success-950/40 dark:text-success-400',
@@ -46,6 +48,7 @@ export default function OfferDetailsPage() {
   const previousImage = () => setActiveImage((current) => current === 0 ? gallery.length - 1 : current - 1);
   const nextImage = () => setActiveImage((current) => current === gallery.length - 1 ? 0 : current + 1);
   const handleVerifyOffer = () => { trackClick(offer.id, offer.slug, 'check_offer'); setShowRedirectMsg(true); if (offer.offer_url && offer.offer_url !== '#') window.open(offer.offer_url, '_blank', 'noopener,noreferrer'); else showToast('Link-ul furnizorului nu este disponibil momentan.', 'error'); };
+  const klookWidget = findKlookWidgetForDestination(offer.destination);
 
   return <div className="container-page py-8">
     <div className="mb-6 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400"><Link to="/" className="hover:text-brand-600">Acasă</Link><ChevronRight className="h-4 w-4" /><Link to="/oferte" className="hover:text-brand-600">Oferte</Link><ChevronRight className="h-4 w-4" /><span className="truncate text-slate-700 dark:text-slate-300">{offer.destination}</span></div>
@@ -81,6 +84,16 @@ export default function OfferDetailsPage() {
         </div></div>
 
         <div className="card mt-6 p-6"><h2 className="mb-4 text-lg font-bold">Cazare</h2>{offer.accommodation_included ? <div className="flex items-start gap-4"><div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-950/40 dark:text-brand-400"><Hotel className="h-6 w-6" /></div><div><h3 className="font-bold">{offer.hotel_name || 'Cazare inclusă'}</h3>{offer.hotel_stars && <div className="mt-1 flex items-center gap-1">{Array.from({ length: offer.hotel_stars }).map((_, i) => <Star key={i} className="h-4 w-4 fill-accent-500 text-accent-500" />)}</div>}{offer.number_of_nights ? <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{offer.number_of_nights} nopți incluse în pachet.</p> : null}</div></div> : <div className="flex items-center gap-3 rounded-xl border border-warning-100 bg-warning-50 p-4 text-sm text-warning-700 dark:border-warning-900/50 dark:bg-warning-950/30 dark:text-warning-300"><Building2 className="h-5 w-5 shrink-0" /><span><strong>Cazarea nu este inclusă.</strong> Prețul afișat se referă la componentele indicate în ofertă.</span></div>}</div>
+
+        {klookWidget && (
+          <div className="card mt-6 p-6">
+            <h2 className="mb-1 text-lg font-bold">Ce poți face în {klookWidget.label}</h2>
+            <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+              Excursii și activități reale, via Klook.
+            </p>
+            <KlookToursWidget src={klookWidget.src} />
+          </div>
+        )}
 
         <div className="card mt-6 p-6"><h2 className="mb-4 text-lg font-bold">Ce este inclus</h2>{includedItems.length > 0 ? <div className="grid gap-3 sm:grid-cols-2">{includedItems.map((item, index) => <div key={index} className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success-600 dark:text-success-400" /><span>{item}</span></div>)}</div> : <p className="text-sm text-slate-500 dark:text-slate-400">Componentele incluse nu sunt specificate complet pentru această ofertă.</p>}</div>
 

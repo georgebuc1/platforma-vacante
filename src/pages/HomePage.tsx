@@ -11,6 +11,7 @@ import {
   Zap,
 } from 'lucide-react';
 import HeroSearchBar from '@/components/search/HeroSearchBar';
+import PopularToursSection from '@/components/widgets/PopularToursSection';
 import OfferCard from '@/components/offers/OfferCard';
 import { getOffers } from '@/services/storageService';
 import { sortOffers } from '@/utils/filters';
@@ -296,6 +297,12 @@ export default function HomePage() {
         </div>
 
       </section>
+
+
+      {/* =========================================================
+          POPULAR TOURS (Klook widgets)
+      ========================================================= */}
+      <PopularToursSection />
 
 
       {/* =========================================================
