@@ -9,6 +9,11 @@ import BiletePage from '@/pages/BiletePage';
 import CazariPage from '@/pages/CazariPage';
 import RentACarPage from '@/pages/RentACarPage';
 import LastMinutePage from '@/pages/LastMinutePage';
+import GhiduriPage from '@/pages/GhiduriPage';
+import GhidDetailsPage from '@/pages/GhidDetailsPage';
+import ZborHotelPage from '@/pages/ZborHotelPage';
+import AtractiiPage from '@/pages/AtractiiPage';
+import TaxiuriAeroportPage from '@/pages/TaxiuriAeroportPage';
 import OfferDetailsPage from '@/pages/OfferDetailsPage';
 import AlertsPage from '@/pages/AlertsPage';
 import AboutPage from '@/pages/AboutPage';
@@ -37,6 +42,11 @@ export default function App() {
           <Route path="/cazari" element={<CazariPage />} />
           <Route path="/rent-a-car" element={<RentACarPage />} />
           <Route path="/last-minute" element={<LastMinutePage />} />
+          <Route path="/ghiduri" element={<GhiduriPage />} />
+          <Route path="/ghiduri/:slug" element={<GhidDetailsPage />} />
+          <Route path="/zbor-hotel" element={<ZborHotelPage />} />
+          <Route path="/atractii" element={<AtractiiPage />} />
+          <Route path="/taxiuri-aeroport" element={<TaxiuriAeroportPage />} />
           <Route path="/alerte" element={<AlertsPage />} />
           <Route path="/despre" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

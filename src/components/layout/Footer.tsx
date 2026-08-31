@@ -61,6 +61,15 @@ export default function Footer() {
 
               <li>
                 <Link
+                  to="/ghiduri"
+                  className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
+                >
+                  Ghiduri
+                </Link>
+              </li>
+
+              <li>
+                <Link
                   to="/despre"
                   className="text-navy-200 transition-colors hover:text-white dark:text-slate-400 dark:hover:text-brand-400"
                 >

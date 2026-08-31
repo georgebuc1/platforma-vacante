@@ -1,36 +1,37 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, BedDouble, Car, Zap, MapPin, Calendar, Search } from 'lucide-react';
+import { BedDouble, MapPin, Calendar, Users, Search, Minus, Plus } from 'lucide-react';
 import type { SearchFilters } from '@/types';
 import { DESTINATIONS, searchDestinations, type DestinationOption } from '@/data/destinations';
 import { MONTHS } from '@/components/search/SearchForm';
 
 type CategoryKey = 'bilete' | 'cazari' | 'rent-a-car' | 'last-minute';
 
-const CATEGORIES: { key: CategoryKey; label: string; icon: typeof Plane; route: string }[] = [
-  { key: 'bilete', label: 'Bilete', icon: Plane, route: '/bilete' },
-  { key: 'cazari', label: 'Cazări', icon: BedDouble, route: '/cazari' },
-  { key: 'rent-a-car', label: 'Rent a car', icon: Car, route: '/rent-a-car' },
-  { key: 'last-minute', label: 'Last minute', icon: Zap, route: '/last-minute' },
-];
+const ROUTE_BY_CATEGORY: Record<CategoryKey, string> = {
+  bilete: '/bilete',
+  cazari: '/cazari',
+  'rent-a-car': '/rent-a-car',
+  'last-minute': '/last-minute',
+};
 
-// Maps a JS Date month index (0-11) to the matching value in MONTHS
-// (e.g. 0 -> 'ianuarie'), so picking a depart date can also narrow the
-// results by month without the person having to set two separate fields.
 function monthValueForDate(date: Date): string {
   const names = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
   return names[date.getMonth()];
 }
 
 interface HeroSearchBarProps {
+  /** Which category this search submits to. The Header's Booking-style tab
+   *  strip is the actual category switcher now (matching Booking.com,
+   *  where the tabs above the bar ARE the navigation) — this component no
+   *  longer duplicates its own tab row. */
   defaultCategory?: CategoryKey;
 }
 
 export default function HeroSearchBar({ defaultCategory = 'bilete' }: HeroSearchBarProps) {
   const navigate = useNavigate();
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const guestsRef = useRef<HTMLDivElement>(null);
 
-  const [category, setCategory] = useState<CategoryKey>(defaultCategory);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<DestinationOption | null>(null);
   const [suggestions, setSuggestions] = useState<DestinationOption[]>(DESTINATIONS);
@@ -39,11 +40,18 @@ export default function HeroSearchBar({ defaultCategory = 'bilete' }: HeroSearch
   const [returnDate, setReturnDate] = useState('');
   const [error, setError] = useState('');
 
-  // Close the dropdown on outside click
+  const [showGuests, setShowGuests] = useState(false);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [rooms, setRooms] = useState(1);
+
   useEffect(() => {
     function onClick(e: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setShowSuggestions(false);
+      }
+      if (guestsRef.current && !guestsRef.current.contains(e.target as Node)) {
+        setShowGuests(false);
       }
     }
     document.addEventListener('mousedown', onClick);
@@ -65,99 +73,86 @@ export default function HeroSearchBar({ defaultCategory = 'bilete' }: HeroSearch
     setError('');
   };
 
-  const activeCategory = CATEGORIES.find((c) => c.key === category)!;
+  const adjust = (setter: typeof setAdults, value: number, min: number) => {
+    setter(Math.max(min, value));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // "Căutare exactă": we only accept a destination that matches one of
-    // our known destinations (either picked from the dropdown, or typed
-    // exactly). Anything else would silently return zero results anyway,
-    // since offers are matched by an exact destination string.
     const match =
       selected ||
       DESTINATIONS.find((d) => d.city.toLowerCase() === query.trim().toLowerCase());
 
     if (!query.trim()) {
-      setError('Introdu o destinație.');
+      setError('Introduceți destinația.');
       return;
     }
     if (!match) {
-      setError('Alege o destinație din listă, ca să găsim exact ce cauți.');
+      setError('Alegeți o destinație din listă, ca să găsim exact ce căutați.');
       return;
     }
 
     const filters: SearchFilters = { destination: match.city };
 
-    if (category === 'cazari') filters.accommodation_only = true;
-    if (category === 'rent-a-car') filters.transport_type = 'masina';
-    if (category === 'bilete') filters.transport_type = 'avion';
-    if (category === 'last-minute') filters.last_minute = true;
+    if (defaultCategory === 'cazari') filters.accommodation_only = true;
+    if (defaultCategory === 'rent-a-car') filters.transport_type = 'masina';
+    if (defaultCategory === 'bilete') filters.transport_type = 'avion';
+    if (defaultCategory === 'last-minute') filters.last_minute = true;
 
     if (departDate) {
       filters.month = monthValueForDate(new Date(departDate));
     }
 
-    navigate(activeCategory.route, { state: filters });
+    navigate(ROUTE_BY_CATEGORY[defaultCategory], { state: filters });
   };
 
+  const guestsSummary = `${adults} ${adults === 1 ? 'adult' : 'adulți'} \u00b7 ${children} copii \u00b7 ${rooms} ${rooms === 1 ? 'cameră' : 'camere'}`;
+
   return (
-    <div className="bg-white rounded-2xl shadow-card-hover border border-slate-200 p-4 sm:p-5">
+    <form
+      onSubmit={handleSubmit}
+      className="rounded-lg border-2 border-warning-400 bg-white shadow-card-hover overflow-visible"
+    >
+      <div className="flex flex-col lg:flex-row lg:items-stretch divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
 
-      {/* Category tabs */}
-      <div className="flex flex-wrap items-center gap-1 border-b border-slate-100 pb-3 mb-4">
-        {CATEGORIES.map((cat) => {
-          const Icon = cat.icon;
-          const isActive = cat.key === category;
-          return (
-            <button
-              key={cat.key}
-              type="button"
-              onClick={() => setCategory(cat.key)}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-                isActive
-                  ? 'bg-brand-50 text-brand-700'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              {cat.label.toUpperCase()}
-            </button>
-          );
-        })}
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 lg:flex-row lg:items-stretch">
-
-        {/* Destination input with autocomplete */}
-        <div ref={wrapperRef} className="relative flex-1 min-w-0">
-          <div className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3.5 h-14">
-            <MapPin className="h-5 w-5 text-brand-500 shrink-0" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => handleQueryChange(e.target.value)}
-              onFocus={() => { setSuggestions(searchDestinations(query)); setShowSuggestions(true); }}
-              placeholder="Unde vrei să mergi? (ex: Antalya)"
-              className="w-full bg-transparent outline-none text-sm sm:text-base text-slate-800 placeholder:text-slate-400"
-              autoComplete="off"
-            />
+        {/* Destination */}
+        <div ref={wrapperRef} className="relative flex-[1.4] min-w-0">
+          <div className="flex items-center gap-2.5 px-4 h-14">
+            <BedDouble className="h-5 w-5 text-slate-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <label className="block text-[11px] font-medium text-slate-500 leading-tight">
+                Introduceți destinația
+              </label>
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                onFocus={() => { setSuggestions(searchDestinations(query)); setShowSuggestions(true); }}
+                placeholder="Unde mergeți?"
+                className="w-full bg-transparent outline-none text-sm font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal"
+                autoComplete="off"
+              />
+            </div>
           </div>
 
           {showSuggestions && suggestions.length > 0 && (
-            <ul className="absolute z-20 mt-1.5 w-full max-h-72 overflow-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+            <ul className="absolute z-30 mt-1 w-full max-h-72 overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+              <li className="px-4 pt-2.5 pb-1 text-xs font-bold text-slate-400 uppercase tracking-wide">
+                Destinații populare
+              </li>
               {suggestions.map((s) => (
                 <li key={s.iata}>
                   <button
                     type="button"
                     onClick={() => handleSelect(s)}
-                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-sm hover:bg-brand-50 transition-colors"
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-sm hover:bg-slate-50 transition-colors"
                   >
                     <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
                     <span className="text-slate-800">
-                      {s.city}, <span className="text-slate-500">{s.country}</span>
+                      <span className="font-semibold">{s.city}</span>
+                      <span className="text-slate-500"> {s.country}</span>
                     </span>
-                    <span className="ml-auto text-xs font-mono text-slate-400">{s.iata}</span>
                   </button>
                 </li>
               ))}
@@ -166,39 +161,101 @@ export default function HeroSearchBar({ defaultCategory = 'bilete' }: HeroSearch
         </div>
 
         {/* Dates */}
-        <div className="flex gap-3">
-          <div className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3.5 h-14 flex-1 lg:w-40">
-            <Calendar className="h-4 w-4 text-brand-500 shrink-0" />
-            <input
-              type="date"
-              value={departDate}
-              onChange={(e) => setDepartDate(e.target.value)}
-              className="w-full bg-transparent outline-none text-sm text-slate-700"
-            />
+        <div className="flex flex-1">
+          <div className="flex items-center gap-2.5 px-4 h-14 flex-1 min-w-0">
+            <Calendar className="h-5 w-5 text-slate-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <label className="block text-[11px] font-medium text-slate-500 leading-tight">
+                Selectați datele
+              </label>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="date"
+                  value={departDate}
+                  onChange={(e) => setDepartDate(e.target.value)}
+                  className="w-full bg-transparent outline-none text-sm font-semibold text-slate-800 [color-scheme:light]"
+                />
+                <span className="text-slate-300 shrink-0">—</span>
+                <input
+                  type="date"
+                  value={returnDate}
+                  min={departDate || undefined}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                  className="w-full bg-transparent outline-none text-sm font-semibold text-slate-800 [color-scheme:light]"
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200 px-3.5 h-14 flex-1 lg:w-40">
-            <Calendar className="h-4 w-4 text-brand-500 shrink-0" />
-            <input
-              type="date"
-              value={returnDate}
-              min={departDate || undefined}
-              onChange={(e) => setReturnDate(e.target.value)}
-              className="w-full bg-transparent outline-none text-sm text-slate-700"
-            />
-          </div>
+        </div>
+
+        {/* Guests / rooms */}
+        <div ref={guestsRef} className="relative flex-1">
+          <button
+            type="button"
+            onClick={() => setShowGuests((v) => !v)}
+            className="w-full flex items-center gap-2.5 px-4 h-14 text-left"
+          >
+            <Users className="h-5 w-5 text-slate-500 shrink-0" />
+            <div className="flex-1 min-w-0">
+              <label className="block text-[11px] font-medium text-slate-500 leading-tight">
+                Selectați numărul de camere/oaspeți
+              </label>
+              <span className="block truncate text-sm font-semibold text-slate-800">
+                {guestsSummary}
+              </span>
+            </div>
+          </button>
+
+          {showGuests && (
+            <div className="absolute z-30 right-0 mt-1 w-72 rounded-lg border border-slate-200 bg-white shadow-lg p-4 space-y-4">
+              {([
+                ['Adulți', adults, setAdults, 1],
+                ['Copii', children, setChildren, 0],
+                ['Camere', rooms, setRooms, 1],
+              ] as const).map(([label, value, setter, min]) => (
+                <div key={label} className="flex items-center justify-between">
+                  <span className="text-sm font-semibold text-slate-700">{label}</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => adjust(setter, value - 1, min)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:border-cta-500 hover:text-cta-500 transition-colors"
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </button>
+                    <span className="w-4 text-center text-sm font-semibold">{value}</span>
+                    <button
+                      type="button"
+                      onClick={() => adjust(setter, value + 1, min)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 hover:border-cta-500 hover:text-cta-500 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setShowGuests(false)}
+                className="w-full rounded-lg bg-cta-500 text-white text-sm font-semibold py-2 hover:bg-cta-400 transition-colors"
+              >
+                Selectați
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Search button */}
         <button
           type="submit"
-          className="btn-primary h-14 px-6 shrink-0 text-sm sm:text-base"
+          className="flex items-center justify-center gap-2 h-14 lg:w-auto px-8 bg-cta-500 text-white font-bold text-sm hover:bg-cta-400 transition-colors lg:rounded-r-[6px]"
         >
           <Search className="h-5 w-5" />
-          CAUTĂ
+          Căutare
         </button>
-      </form>
+      </div>
 
-      {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
-    </div>
+      {error && <p className="px-4 py-2 text-xs text-error-600">{error}</p>}
+    </form>
   );
 }
