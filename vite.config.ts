@@ -13,4 +13,13 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    proxy: {
+      '/api/travelpayouts': {
+        target: 'https://api.travelpayouts.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/travelpayouts/, ''),
+      },
+    },
+  },
 });

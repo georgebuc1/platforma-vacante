@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BedDouble, MapPin, Calendar, Users, Search, Minus, Plus } from 'lucide-react';
+import { BedDouble, MapPin, Users, Search, Minus, Plus } from 'lucide-react';
 import type { SearchFilters } from '@/types';
 import { DESTINATIONS, searchDestinations, type DestinationOption } from '@/data/destinations';
 import { MONTHS } from '@/components/search/SearchForm';
+import DateRangePicker from '@/components/search/DateRangePicker';
 
 type CategoryKey = 'bilete' | 'cazari' | 'rent-a-car' | 'last-minute';
 
@@ -160,33 +161,12 @@ export default function HeroSearchBar({ defaultCategory = 'bilete' }: HeroSearch
           )}
         </div>
 
-        {/* Dates */}
-        <div className="flex flex-1">
-          <div className="flex items-center gap-2.5 px-4 h-14 flex-1 min-w-0">
-            <Calendar className="h-5 w-5 text-slate-500 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <label className="block text-[11px] font-medium text-slate-500 leading-tight">
-                Selectați datele
-              </label>
-              <div className="flex items-center gap-1.5">
-                <input
-                  type="date"
-                  value={departDate}
-                  onChange={(e) => setDepartDate(e.target.value)}
-                  className="w-full bg-transparent outline-none text-sm font-semibold text-slate-800 [color-scheme:light]"
-                />
-                <span className="text-slate-300 shrink-0">—</span>
-                <input
-                  type="date"
-                  value={returnDate}
-                  min={departDate || undefined}
-                  onChange={(e) => setReturnDate(e.target.value)}
-                  className="w-full bg-transparent outline-none text-sm font-semibold text-slate-800 [color-scheme:light]"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Dates — shared calendar, matches Booking.com's check-in/check-out picker */}
+        <DateRangePicker
+          departDate={departDate}
+          returnDate={returnDate}
+          onChange={(d, r) => { setDepartDate(d); setReturnDate(r); }}
+        />
 
         {/* Guests / rooms */}
         <div ref={guestsRef} className="relative flex-1">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, Download, ArrowLeft, CheckCircle2, XCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { Upload, Download, ArrowLeft, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
 import { parseOffersCsv, buildCsvTemplate, type ParsedRow } from '@/utils/csvImport';
 import { getExistingSlugs, saveOffer } from '@/services/storageService';
 import { showToast } from '@/components/common/Toast';
@@ -79,15 +79,22 @@ export default function AdminOfferImport() {
         Adaugă mai multe oferte deodată dintr-un fișier CSV, în loc să completezi formularul una câte una.
       </p>
 
-      {/* Step 1: template */}
+      {/* Step 1: template and API sync */}
       <div className="card p-5 mb-5">
-        <h2 className="font-bold text-slate-800 mb-1">1. Descarcă modelul CSV</h2>
-        <p className="text-sm text-slate-500 mb-3">
-          Fișierul are un rând de exemplu completat — șterge-l sau păstrează-l ca referință, apoi adaugă ofertele tale sub el, câte un rând per ofertă.
-        </p>
-        <button onClick={handleDownloadTemplate} className="btn-primary text-sm">
-          <Download className="h-4 w-4" /> Descarcă model-import-oferte.csv
-        </button>
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div>
+            <h2 className="font-bold text-slate-800 mb-1">1. Descarcă modelul CSV</h2>
+            <p className="text-sm text-slate-500 mb-3">
+              Fișierul are un rând de exemplu completat — șterge-l sau păstrează-l ca referință, apoi adaugă ofertele tale sub el, câte un rând per ofertă.
+            </p>
+          </div>
+
+          <div className="flex-1 flex flex-col sm:flex-row">
+            <button onClick={handleDownloadTemplate} className="btn-primary text-sm w-full sm:w-auto">
+              <Download className="h-4 w-4" /> Descarcă model-import-oferte.csv
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Step 2: upload */}

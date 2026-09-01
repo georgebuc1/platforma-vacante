@@ -190,6 +190,47 @@ export async function saveOffer(offer: Offer): Promise<Offer> {
   return rowToOffer(data as DbOfferRow);
 }
 
+export async function bulkUpsertOffers(offers: Offer[]): Promise<{ success: number; failed: number }> {
+  let success = 0;
+  let failed = 0;
+
+  // Process in batches to avoid payload limits
+  const BATCH_SIZE = 50;
+  for (let i = 0; i < offers.length; i += BATCH_SIZE) {
+    const batch = offers.slice(i, i + BATCH_SIZE);
+
+    try {
+      // Convert offers to database payloads
+      const payloads = batch.map(offer => offerToPayload(offer));
+
+      // Use upsert (insert or update on conflict)
+      const { error } = await supabase
+        .from('offers')
+        .upsert(payloads, { onConflict: 'slug' });
+
+      if (error) {
+        throw error;
+      }
+
+      success += batch.length;
+    } catch (error) {
+      console.error('Error in batch upsert:', error);
+      // If batch fails, try individual offers for better error reporting
+      for (const offer of batch) {
+        try {
+          await saveOffer(offer);
+          success++;
+        } catch (individualError) {
+          console.error('Error saving individual offer:', individualError);
+          failed++;
+        }
+      }
+    }
+  }
+
+  return { success, failed };
+}
+
 export async function updateOffer(id: string, updates: Partial<Offer>): Promise<Offer | undefined> {
   const numId = Number(id);
   if (isNaN(numId)) return undefined;
