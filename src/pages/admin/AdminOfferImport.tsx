@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Upload, Download, ArrowLeft, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
+import { Upload, Download, ArrowLeft, CheckCircle2, XCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { parseOffersCsv, buildCsvTemplate, type ParsedRow } from '@/utils/csvImport';
 import { getExistingSlugs, saveOffer } from '@/services/storageService';
 import { showToast } from '@/components/common/Toast';
