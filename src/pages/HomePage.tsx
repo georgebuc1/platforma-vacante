@@ -109,7 +109,7 @@ export default function HomePage() {
 
         {/* Search box — overlaps the navy band and the white section below */}
         <div className="container-page relative z-10 -mt-14 pb-2 sm:-mt-16">
-          <div className="mx-auto max-w-6xl animate-fade-in">
+          <div className="mx-auto max-w-7xl animate-fade-in">
             <HeroSearchBar />
           </div>
 
