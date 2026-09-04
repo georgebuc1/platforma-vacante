@@ -4,7 +4,7 @@ import { BedDouble, MapPin, Users, Search, Minus, Plus } from 'lucide-react';
 import type { SearchFilters } from '@/types';
 import { DESTINATIONS, searchDestinations, type DestinationOption } from '@/data/destinations';
 import { MONTHS } from '@/components/search/SearchForm';
-import DateRangePicker from '@/components/search/DateRangePicker';
+import DateRangePicker, { parseLocalDate } from '@/components/search/DateRangePicker';
 
 type CategoryKey = 'bilete' | 'cazari' | 'rent-a-car' | 'last-minute';
 
@@ -102,7 +102,7 @@ export default function HeroSearchBar({ defaultCategory = 'bilete' }: HeroSearch
     if (defaultCategory === 'last-minute') filters.last_minute = true;
 
     if (departDate) {
-      filters.month = monthValueForDate(new Date(departDate));
+      filters.month = monthValueForDate(parseLocalDate(departDate));
     }
 
     navigate(ROUTE_BY_CATEGORY[defaultCategory], { state: filters });

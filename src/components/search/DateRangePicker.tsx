@@ -14,7 +14,22 @@ const MONTH_LABELS = [
 ];
 
 function toISO(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  // IMPORTANT: nu folosim d.toISOString() aici — acea metodă convertește data
+  // în UTC înainte de a o transforma în text, ceea ce în România (UTC+2/UTC+3)
+  // face ca miezul nopții local să devină ziua PRECEDENTĂ în UTC, salvând astfel
+  // o zi greșită. Construim string-ul direct din anul/luna/ziua locale.
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Parsează un string "YYYY-MM-DD" ca dată LOCALĂ, evitând ca new Date(string)
+// să interpreteze data ca miezul nopții UTC (ceea ce ar putea afișa/compara
+// ziua greșită în fusul orar local).
+export function parseLocalDate(isoDate: string): Date {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return new Date(year, (month || 1) - 1, day || 1);
 }
 
 function startOfDay(d: Date): Date {
@@ -43,8 +58,8 @@ export default function DateRangePicker({ departDate, returnDate, onChange }: Da
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const selectedDepart = departDate ? startOfDay(new Date(departDate)) : null;
-  const selectedReturn = returnDate ? startOfDay(new Date(returnDate)) : null;
+  const selectedDepart = departDate ? startOfDay(parseLocalDate(departDate)) : null;
+  const selectedReturn = returnDate ? startOfDay(parseLocalDate(returnDate)) : null;
   const today = startOfDay(new Date());
 
   useEffect(() => {
@@ -148,9 +163,9 @@ export default function DateRangePicker({ departDate, returnDate, onChange }: Da
             Selectați datele
           </label>
           <span className="block truncate text-sm font-semibold text-slate-800">
-            {departDate ? new Date(departDate).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }) : 'Dată check-in'}
+            {departDate ? parseLocalDate(departDate).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }) : 'Dată check-in'}
             {'  \u2014  '}
-            {returnDate ? new Date(returnDate).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }) : 'Dată check-out'}
+            {returnDate ? parseLocalDate(returnDate).toLocaleDateString('ro-RO', { day: 'numeric', month: 'short' }) : 'Dată check-out'}
           </span>
         </div>
       </button>
