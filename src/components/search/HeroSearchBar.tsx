@@ -34,12 +34,12 @@ function initializeAgoda() {
   if (!container || container.dataset.agodaInitialized === 'true') return;
 
   const stg: AgodaSherpaConfig = {
-    crt: '5779154441666',
+    crt: '5790950623308',
     version: '1.04',
     id: AGODA_CONTAINER_ID,
     name: AGODA_CONTAINER_ID,
-    width: '1288px',
-    height: '300px',
+    width: '900px',
+    height: '257px',
     ReferenceKey: 'KQRZbpWLVI4lEAvV27V8Ig==',
     Layout: 'Oneline',
     Language: 'ro-ro',
@@ -85,7 +85,7 @@ export default function HeroSearchBar() {
     <div className="w-full overflow-x-auto rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <div
         id={AGODA_CONTAINER_ID}
-        className="mx-auto min-w-[1288px]"
+        className="mx-auto min-w-[900px]"
         aria-label="Căutare cazare Agoda"
       />
     </div>
