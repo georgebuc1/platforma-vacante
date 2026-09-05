@@ -59,7 +59,7 @@ export default function Header() {
 
             <button
               type="button"
-              className="md:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+              className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Meniu"
             >
@@ -67,56 +67,13 @@ export default function Header() {
             </button>
           </div>
         </div>
-
-        {/* Booking.com-style icon tab strip (desktop only) */}
-        <nav className="hidden md:flex items-center gap-1 pb-3 -mt-1 overflow-x-auto">
-          {NAV_LINKS.map((link) => {
-            const Icon = link.icon;
-            return (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                    isActive
-                      ? 'bg-white text-navy-700'
-                      : 'text-navy-100 hover:bg-white/10 hover:text-white'
-                  }`
-                }
-              >
-                <Icon className="h-4 w-4" />
-                {link.label}
-              </NavLink>
-            );
-          })}
-
-          <span className="mx-1 h-6 w-px bg-white/20 shrink-0" />
-
-          {EXTRA_LINKS.map((link) => {
-            const Icon = link.icon;
-            return (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                    isActive
-                      ? 'bg-white text-navy-700'
-                      : 'text-navy-100 hover:bg-white/10 hover:text-white'
-                  }`
-                }
-              >
-                <Icon className="h-4 w-4" />
-                {link.label}
-              </NavLink>
-            );
-          })}
-        </nav>
       </div>
 
-      {/* Mobile menu */}
+      {/* Meniul complet (Sejururi, Zboruri etc.) — acum e mereu ascuns în
+          spatele hamburgerului, pe orice dimensiune de ecran, nu doar pe
+          mobil. */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-navy-700/50 bg-navy-600 dark:bg-navy-900 animate-fade-in transition-colors duration-300">
+        <div className="border-t border-navy-700/50 bg-navy-600 dark:bg-navy-900 animate-fade-in transition-colors duration-300">
           <nav className="container-page py-3 flex flex-col gap-1">
             {[...NAV_LINKS, ...EXTRA_LINKS].map((link) => {
               const Icon = link.icon;

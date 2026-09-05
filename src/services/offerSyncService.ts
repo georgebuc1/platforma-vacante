@@ -4,7 +4,9 @@
  */
 
 import { travelpayoutsService } from '@/services/travelpayoutsService';
+import { agodaService } from '@/services/agodaService';
 import { offerTransformers } from '@/utils/offerTransformer';
+import { transformAgodaResultsToOffers, type AgodaTransformContext } from '@/utils/agodaTransformer';
 import type { Offer } from '@/types';
 import {
   getOffers,
@@ -13,6 +15,13 @@ import {
   deleteOffer,
   getExistingSlugs
 } from '@/services/storageService';
+
+/** One destination to search+sync via Agoda's city search endpoint. */
+export interface AgodaCitySyncTarget {
+  cityId: number; // Agoda's numeric city id (get this from your account manager / Agoda's city list)
+  destinationName: string; // display name, e.g. "Antalya"
+  country: string; // e.g. "Turcia"
+}
 
 interface SyncOptions {
   destinations?: string[]; // Specific destinations to sync
@@ -372,6 +381,78 @@ export class OfferSyncService {
     // Return 1-3 simulated offers per destination
     const count = Math.floor(Math.random() * 3) + 1;
     return baseOffers.slice(0, count);
+  }
+
+  /**
+   * Sync hotel offers from Agoda's Long Tail Search API for a list of cities.
+   * Call this from your admin sync page/button, e.g.:
+   *
+   *   await offerSyncService.syncFromAgoda([
+   *     { cityId: 9395, destinationName: 'Bangkok', country: 'Thailanda' },
+   *   ], { checkInDate: '2026-10-10', checkOutDate: '2026-10-13' });
+   */
+  async syncFromAgoda(
+    targets: AgodaCitySyncTarget[],
+    dates: { checkInDate: string; checkOutDate: string },
+    options: SyncOptions = {}
+  ): Promise<SyncResult> {
+    const result: SyncResult = { success: 0, failed: 0, total: 0, errors: [] };
+
+    const existingOffers = await getOffers();
+    const existingSlugs = new Set(existingOffers.map((offer) => offer.slug));
+
+    for (const target of targets) {
+      try {
+        const hotels = await agodaService.searchCity({
+          cityId: target.cityId,
+          checkInDate: dates.checkInDate,
+          checkOutDate: dates.checkOutDate,
+          maxResult: options.limitPerDestination || 20,
+          currency: 'RON',
+          language: 'ro-ro',
+        });
+
+        const ctx: AgodaTransformContext = {
+          destination: target.destinationName,
+          country: target.country,
+          checkInDate: dates.checkInDate,
+          checkOutDate: dates.checkOutDate,
+        };
+
+        const offers = transformAgodaResultsToOffers(hotels, ctx);
+
+        for (const offer of offers) {
+          result.total++;
+          try {
+            if (!options.forceUpdate && existingSlugs.has(offer.slug)) {
+              result.success++;
+              continue;
+            }
+            const saved = await saveOffer(offer);
+            if (saved) {
+              result.success++;
+              existingSlugs.add(offer.slug);
+            } else {
+              throw new Error('Failed to save Agoda offer');
+            }
+          } catch (error) {
+            result.failed++;
+            result.errors.push({
+              destination: target.destinationName,
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+        }
+      } catch (error) {
+        result.failed++;
+        result.errors.push({
+          destination: target.destinationName,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }
+
+    return result;
   }
 
   /**

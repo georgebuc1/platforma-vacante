@@ -15,6 +15,7 @@ import ZborHotelPage from '@/pages/ZborHotelPage';
 import AtractiiPage from '@/pages/AtractiiPage';
 import TaxiuriAeroportPage from '@/pages/TaxiuriAeroportPage';
 import OfferDetailsPage from '@/pages/OfferDetailsPage';
+import CazareCautaPage from '@/pages/CazareCautaPage';
 import AlertsPage from '@/pages/AlertsPage';
 import AboutPage from '@/pages/AboutPage';
 import ContactPage from '@/pages/ContactPage';
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/oferte/:slug" element={<OfferDetailsPage />} />
           <Route path="/bilete" element={<BiletePage />} />
           <Route path="/cazari" element={<CazariPage />} />
+          <Route path="/cazare-cauta" element={<CazareCautaPage />} />
           <Route path="/rent-a-car" element={<RentACarPage />} />
           <Route path="/last-minute" element={<LastMinutePage />} />
           <Route path="/ghiduri" element={<GhiduriPage />} />

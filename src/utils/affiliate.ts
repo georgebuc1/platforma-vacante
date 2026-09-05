@@ -68,3 +68,40 @@ export function getStoredAffiliateId(): string {
     return '';
   }
 }
+
+// Same Agoda affiliate CID already used for the Sherpa widget
+// (see src/components/search/HeroSearchBar.tsx) — reused here so clicks
+// stay attributed even for destinations we don't have a verified
+// agodaCityId for.
+const AGODA_CID = '1972943';
+
+/**
+ * Builds a link straight to agoda.com's own search results for a
+ * destination we only know by name (no verified numeric agodaCityId).
+ *
+ * Why this exists: Agoda's Long Tail Search API (used by agodaService.ts)
+ * requires a numeric cityId — it has no public "search by city name"
+ * endpoint. Agoda only hands out a cityId lookup table as a data-feed
+ * download in the affiliate portal, not as a live API call. Their own
+ * website, however, accepts a free-text `textToSearch` query param and
+ * resolves it server-side, so that's what we fall back to for any
+ * destination outside our verified list.
+ */
+export function buildAgodaSearchFallbackUrl(params: {
+  destinationName: string;
+  checkInDate: string;
+  checkOutDate: string;
+  adults: number;
+  children: number;
+}): string {
+  const url = new URL('https://www.agoda.com/search');
+  url.searchParams.set('textToSearch', params.destinationName);
+  url.searchParams.set('checkIn', params.checkInDate);
+  url.searchParams.set('checkOut', params.checkOutDate);
+  url.searchParams.set('adults', String(params.adults));
+  url.searchParams.set('children', String(params.children));
+  url.searchParams.set('rooms', '1');
+  url.searchParams.set('locale', 'ro-ro');
+  url.searchParams.set('cid', AGODA_CID);
+  return url.toString();
+}
