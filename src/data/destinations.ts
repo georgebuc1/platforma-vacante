@@ -135,7 +135,7 @@ export const DESTINATIONS: DestinationOption[] = [
   { iata: 'AKL', city: 'Auckland', country: 'Noua Zeelandă' },
 ];
 
-function normalize(input: string): string {
+export function normalize(input: string): string {
   return input
     .toLowerCase()
     .normalize('NFD')
