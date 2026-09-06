@@ -67,11 +67,12 @@ export default function Header() {
             </button>
           </div>
         </div>
+
+        {/* Booking.com-style icon tab strip removed — navigation lives in the
+            hamburger menu below on every screen size now. */}
       </div>
 
-      {/* Meniul complet (Sejururi, Zboruri etc.) — acum e mereu ascuns în
-          spatele hamburgerului, pe orice dimensiune de ecran, nu doar pe
-          mobil. */}
+      {/* Dropdown menu — used on every screen size now */}
       {mobileOpen && (
         <div className="border-t border-navy-700/50 bg-navy-600 dark:bg-navy-900 animate-fade-in transition-colors duration-300">
           <nav className="container-page py-3 flex flex-col gap-1">

@@ -1,21 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage } from 'lucide-react';
+import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Loader2 } from 'lucide-react';
 import DateRangePicker from './DateRangePicker';
-import { DESTINATIONS, normalize } from '@/data/destinations';
 import { DEPARTURE_CITIES } from './SearchForm';
-import { preloadWorldCities, searchWorldCities, type WorldCity } from '@/utils/worldCities';
+import { searchAgodaCities, type AgodaCityOption } from '@/services/agodaCityLookupService';
 
 type Tab = 'flights' | 'hotels' | 'cars';
-
-/** Destinația aleasă în câmpul "Destinație", indiferent dacă vine din lista
- * noastră curată (cu id Agoda verificat, eventual) sau din datasetul mondial
- * de orașe (fără id — vezi utils/worldCities.ts pentru motiv). */
-interface SelectedDestination {
-  city: string;
-  country: string;
-  agodaCityId?: number;
-}
 
 const TABS: { key: Tab; label: string; icon: typeof Plane }[] = [
   { key: 'flights', label: 'Bilete avion', icon: Plane },
@@ -105,11 +95,12 @@ export default function TripSearchBar() {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
 
-  // Hotels (Agoda)
+  // Hotels (Agoda) — destination search is async now (queries agoda_cities)
   const [destQuery, setDestQuery] = useState('');
-  const [selectedDest, setSelectedDest] = useState<SelectedDestination | null>(null);
+  const [destResults, setDestResults] = useState<AgodaCityOption[]>([]);
+  const [destLoading, setDestLoading] = useState(false);
+  const [selectedDest, setSelectedDest] = useState<AgodaCityOption | null>(null);
   const [destOpen, setDestOpen] = useState(false);
-  const [worldMatches, setWorldMatches] = useState<WorldCity[]>([]);
   const [checkInDate, setCheckInDate] = useState(defaultCheckIn());
   const [checkOutDate, setCheckOutDate] = useState(defaultCheckOut());
   const destWrapperRef = useRef<HTMLDivElement>(null);
@@ -128,46 +119,27 @@ export default function TripSearchBar() {
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
-  // Interoghează datasetul mondial de orașe (~130.000, încărcat lazy) de
-  // fiecare dată când se schimbă textul căutat, ca sugestiile să apară
-  // imediat, pentru orice oraș din lume — nu doar din lista noastră curată.
+  // Debounced live destination search — queries the curated list instantly
+  // plus `agoda_cities` (worldwide, once populated) after a short pause.
   useEffect(() => {
     let cancelled = false;
-    const trimmed = destQuery.trim();
-    if (trimmed.length < 3) {
-      setWorldMatches([]);
-      return;
-    }
-    searchWorldCities(trimmed, 8).then((matches) => {
-      if (!cancelled) setWorldMatches(matches);
-    });
+    setDestLoading(true);
+    const timer = setTimeout(() => {
+      searchAgodaCities(destQuery).then((results) => {
+        if (!cancelled) {
+          setDestResults(results);
+          setDestLoading(false);
+        }
+      });
+    }, 250);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
   }, [destQuery]);
 
-  const q = normalize(destQuery.trim());
-  const curatedMatches = q
-    ? DESTINATIONS.filter((d) => normalize(d.city).includes(q) || normalize(d.country).includes(q))
-    : DESTINATIONS.slice(0, 8);
-
-  // Combinăm cele două surse: lista noastră curată are prioritate (nume în
-  // română, iar unele au și căutare live), completată cu potriviri din
-  // datasetul mondial pentru orice oraș pe care nu-l aveam deja.
-  const worldSuggestions = worldMatches.filter(
-    (w) => !curatedMatches.some((d) => normalize(d.city) === normalize(w.name))
-  );
-  const filteredDestinations: SelectedDestination[] = [
-    ...curatedMatches.map((d) => ({ city: d.city, country: d.country, agodaCityId: d.agodaCityId })),
-    ...worldSuggestions.map((w) => ({ city: w.name, country: w.countryCode })),
-  ].slice(0, 8);
-
   const handleDateChange = (depart: string, ret: string) => {
     setCheckInDate(depart);
-    // NU face fallback pe `depart` aici (era `ret || depart`) — asta bloca
-    // alegerea datei de întoarcere: după primul click, checkOutDate devenea
-    // egal cu checkInDate, iar DateRangePicker credea că intervalul e deja
-    // complet și pornea un interval nou la fiecare click în loc să-l încheie.
     setCheckOutDate(ret);
   };
 
@@ -184,11 +156,6 @@ export default function TripSearchBar() {
         setError('Alege datele sejurului.');
         return;
       }
-
-      // Rezultatele rămân mereu pe site-ul nostru: pentru orașele cu id
-      // Agoda verificat afișăm cardurile noastre cu date live; pentru
-      // restul, pagina de rezultate explică limitarea în loc să te scoată
-      // pe agoda.com cu o potrivire ghicită (vezi CazareCautaPage.tsx).
       navigate('/cazare-cauta', {
         state: {
           agodaCityId: selectedDest.agodaCityId,
@@ -276,9 +243,9 @@ export default function TripSearchBar() {
                   <input
                     type="text"
                     value={destQuery}
-                    onFocus={() => { setDestOpen(true); preloadWorldCities(); }}
+                    onFocus={() => setDestOpen(true)}
                     onChange={(e) => { setDestQuery(e.target.value); setSelectedDest(null); setDestOpen(true); }}
-                    placeholder="Orice oraș din lume"
+                    placeholder="Unde vrei să mergi?"
                     className="block w-full truncate text-sm font-semibold text-slate-800 bg-transparent focus:outline-none placeholder:font-normal placeholder:text-slate-400"
                     autoComplete="off"
                   />
@@ -286,9 +253,14 @@ export default function TripSearchBar() {
               </div>
               {destOpen && (
                 <div className="absolute z-30 mt-1 left-0 right-0 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
-                  {filteredDestinations.length > 0 ? filteredDestinations.map((d) => (
+                  {destLoading && (
+                    <p className="px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Căutăm orașe...
+                    </p>
+                  )}
+                  {!destLoading && destResults.length > 0 && destResults.map((d) => (
                     <button
-                      key={`${d.city}-${d.country}`}
+                      key={d.agodaCityId}
                       type="button"
                       onClick={() => { setSelectedDest(d); setDestQuery(d.city); setDestOpen(false); setError(''); }}
                       className="w-full text-left px-4 py-2.5 hover:bg-brand-50 flex items-center justify-between gap-2"
@@ -296,10 +268,9 @@ export default function TripSearchBar() {
                       <span className="text-sm font-medium text-slate-800">{d.city}</span>
                       <span className="text-xs text-slate-400">{d.country}</span>
                     </button>
-                  )) : (
-                    <p className="px-4 py-3 text-sm text-slate-400">
-                      {destQuery.trim().length < 3 ? 'Scrie cel puțin 3 litere.' : 'Niciun oraș găsit.'}
-                    </p>
+                  ))}
+                  {!destLoading && destResults.length === 0 && (
+                    <p className="px-4 py-3 text-sm text-slate-400">Niciun oraș găsit.</p>
                   )}
                 </div>
               )}
