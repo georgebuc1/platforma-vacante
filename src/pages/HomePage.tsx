@@ -65,7 +65,7 @@ export default function HomePage() {
       {/* =========================================================
           HERO — Santorini background with a readable dark overlay
       ========================================================= */}
-      <section className="relative overflow-hidden bg-navy-600 dark:bg-navy-900">
+      <section className="relative overflow-visible bg-navy-600 dark:bg-navy-900">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-cover bg-center"

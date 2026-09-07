@@ -85,28 +85,28 @@ function GuestsPicker({
       </button>
 
       {open && (
-        <div className="absolute z-30 mt-1 left-0 right-0 sm:w-72 rounded-lg border border-slate-200 bg-white shadow-lg p-4 space-y-3">
+        <div className="absolute z-50 mt-1 left-0 right-0 sm:w-72 rounded-lg border border-slate-200 bg-white shadow-lg p-4 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-slate-700">Adulți</span>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => onChange(Math.max(1, adults - 1), children)} className="h-7 w-7 rounded-full border border-slate-300 flex items-center justify-center hover:border-cta-500">
-                <Minus className="h-3.5 w-3.5" />
+              <button type="button" onClick={() => onChange(Math.max(1, adults - 1), children)} className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-50 text-slate-700 transition-colors hover:border-slate-600 hover:bg-slate-100">
+                <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
               </button>
-              <span className="w-4 text-center text-sm">{adults}</span>
-              <button type="button" onClick={() => onChange(Math.min(12, adults + 1), children)} className="h-7 w-7 rounded-full border border-slate-300 flex items-center justify-center hover:border-cta-500">
-                <Plus className="h-3.5 w-3.5" />
+              <span className="w-4 text-center text-sm font-bold text-slate-800">{adults}</span>
+              <button type="button" onClick={() => onChange(Math.min(12, adults + 1), children)} className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-50 text-slate-700 transition-colors hover:border-slate-600 hover:bg-slate-100">
+                <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               </button>
             </div>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-slate-700">Copii</span>
             <div className="flex items-center gap-3">
-              <button type="button" onClick={() => onChange(adults, Math.max(0, children - 1))} className="h-7 w-7 rounded-full border border-slate-300 flex items-center justify-center hover:border-cta-500">
-                <Minus className="h-3.5 w-3.5" />
+              <button type="button" onClick={() => onChange(adults, Math.max(0, children - 1))} className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-50 text-slate-700 transition-colors hover:border-slate-600 hover:bg-slate-100">
+                <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
               </button>
-              <span className="w-4 text-center text-sm">{children}</span>
-              <button type="button" onClick={() => onChange(adults, Math.min(8, children + 1))} className="h-7 w-7 rounded-full border border-slate-300 flex items-center justify-center hover:border-cta-500">
-                <Plus className="h-3.5 w-3.5" />
+              <span className="w-4 text-center text-sm font-bold text-slate-800">{children}</span>
+              <button type="button" onClick={() => onChange(adults, Math.min(8, children + 1))} className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-400 bg-slate-50 text-slate-700 transition-colors hover:border-slate-600 hover:bg-slate-100">
+                <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               </button>
             </div>
           </div>
@@ -323,7 +323,7 @@ export default function TripSearchBar() {
                 </div>
               </div>
               {destOpen && (
-                <div className="absolute z-30 mt-1 left-0 right-0 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                <div className="absolute z-50 mt-1 left-0 right-0 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
                   {filteredDestinations.length > 0 ? filteredDestinations.map((d) => (
                     <button
                       key={`${d.city}-${d.country}`}
