@@ -9,7 +9,11 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="md:col-span-2">
-            <Link to="/" className="flex items-center gap-2">
+            <Link
+              to="/"
+              className="flex items-center gap-2"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-navy-700 shadow-sm">
                 <Plane className="h-5 w-5" />
               </span>
@@ -97,7 +101,9 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-navy-200 dark:text-slate-400">
                 <Mail className="h-4 w-4 shrink-0" />
-                contact@vacantamea.ro
+                <a href="mailto:contact@vacanta-mea.ro" className="hover:text-white">
+                  contact@vacanta-mea.ro
+                </a>
               </li>
             </ul>
           </div>

@@ -3,6 +3,7 @@ import Layout from '@/components/layout/Layout';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ProtectedRoute from '@/components/admin/ProtectedRoute';
 import { ToastContainer } from '@/components/common/Toast';
+import CookieBanner from '@/components/common/CookieBanner';
 import HomePage from '@/pages/HomePage';
 import OffersPage from '@/pages/OffersPage';
 import BiletePage from '@/pages/BiletePage';
@@ -79,6 +80,7 @@ export default function App() {
         </Route>
       </Routes>
       <ToastContainer />
+      <CookieBanner />
     </BrowserRouter>
   );
 }

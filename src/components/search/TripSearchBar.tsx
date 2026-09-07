@@ -1,17 +1,47 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Loader2 } from 'lucide-react';
+import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Zap } from 'lucide-react';
 import DateRangePicker from './DateRangePicker';
+import { DESTINATIONS, normalize } from '@/data/destinations';
 import { DEPARTURE_CITIES } from './SearchForm';
-import { searchAgodaCities, type AgodaCityOption } from '@/services/agodaCityLookupService';
+import { preloadWorldCities, searchWorldCities, type WorldCity } from '@/utils/worldCities';
 
-type Tab = 'flights' | 'hotels' | 'cars';
+type Tab = 'hotels' | 'flights' | 'cars' | 'last-minute';
+
+/** Destinația aleasă în câmpul "Destinație", indiferent dacă vine din lista
+ * noastră curată (cu id Agoda verificat, eventual) sau din datasetul mondial
+ * de orașe (fără id — vezi utils/worldCities.ts pentru motiv). */
+interface SelectedDestination {
+  city: string;
+  country: string;
+  agodaCityId?: number;
+}
 
 const TABS: { key: Tab; label: string; icon: typeof Plane }[] = [
+  { key: 'hotels', label: 'Hotel', icon: BedDouble },
   { key: 'flights', label: 'Bilete avion', icon: Plane },
-  { key: 'hotels', label: 'Cazări', icon: BedDouble },
-  { key: 'cars', label: 'Mașini', icon: Car },
+  { key: 'cars', label: 'Rent a car', icon: Car },
+  { key: 'last-minute', label: 'Last minute', icon: Zap },
 ];
+
+const TAB_STYLES: Record<Tab, { icon: string; active: string }> = {
+  hotels: {
+    icon: 'bg-sky-50 text-sky-700 group-hover:bg-sky-100',
+    active: 'bg-sky-100 text-sky-900 ring-1 ring-sky-200',
+  },
+  flights: {
+    icon: 'bg-violet-50 text-violet-700 group-hover:bg-violet-100',
+    active: 'bg-violet-100 text-violet-900 ring-1 ring-violet-200',
+  },
+  cars: {
+    icon: 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100',
+    active: 'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200',
+  },
+  'last-minute': {
+    icon: 'bg-amber-50 text-amber-700 group-hover:bg-amber-100',
+    active: 'bg-amber-100 text-amber-900 ring-1 ring-amber-200',
+  },
+};
 
 function defaultCheckIn(): string {
   const d = new Date();
@@ -95,12 +125,11 @@ export default function TripSearchBar() {
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
 
-  // Hotels (Agoda) — destination search is async now (queries agoda_cities)
+  // Hotels (Agoda)
   const [destQuery, setDestQuery] = useState('');
-  const [destResults, setDestResults] = useState<AgodaCityOption[]>([]);
-  const [destLoading, setDestLoading] = useState(false);
-  const [selectedDest, setSelectedDest] = useState<AgodaCityOption | null>(null);
+  const [selectedDest, setSelectedDest] = useState<SelectedDestination | null>(null);
   const [destOpen, setDestOpen] = useState(false);
+  const [worldMatches, setWorldMatches] = useState<WorldCity[]>([]);
   const [checkInDate, setCheckInDate] = useState(defaultCheckIn());
   const [checkOutDate, setCheckOutDate] = useState(defaultCheckOut());
   const destWrapperRef = useRef<HTMLDivElement>(null);
@@ -119,27 +148,46 @@ export default function TripSearchBar() {
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
 
-  // Debounced live destination search — queries the curated list instantly
-  // plus `agoda_cities` (worldwide, once populated) after a short pause.
+  // Interoghează datasetul mondial de orașe (~130.000, încărcat lazy) de
+  // fiecare dată când se schimbă textul căutat, ca sugestiile să apară
+  // imediat, pentru orice oraș din lume — nu doar din lista noastră curată.
   useEffect(() => {
     let cancelled = false;
-    setDestLoading(true);
-    const timer = setTimeout(() => {
-      searchAgodaCities(destQuery).then((results) => {
-        if (!cancelled) {
-          setDestResults(results);
-          setDestLoading(false);
-        }
-      });
-    }, 250);
+    const trimmed = destQuery.trim();
+    if (trimmed.length < 3) {
+      setWorldMatches([]);
+      return;
+    }
+    searchWorldCities(trimmed, 8).then((matches) => {
+      if (!cancelled) setWorldMatches(matches);
+    });
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
   }, [destQuery]);
 
+  const q = normalize(destQuery.trim());
+  const curatedMatches = q
+    ? DESTINATIONS.filter((d) => normalize(d.city).includes(q) || normalize(d.country).includes(q))
+    : DESTINATIONS.slice(0, 8);
+
+  // Combinăm cele două surse: lista noastră curată are prioritate (nume în
+  // română, iar unele au și căutare live), completată cu potriviri din
+  // datasetul mondial pentru orice oraș pe care nu-l aveam deja.
+  const worldSuggestions = worldMatches.filter(
+    (w) => !curatedMatches.some((d) => normalize(d.city) === normalize(w.name))
+  );
+  const filteredDestinations: SelectedDestination[] = [
+    ...curatedMatches.map((d) => ({ city: d.city, country: d.country, agodaCityId: d.agodaCityId })),
+    ...worldSuggestions.map((w) => ({ city: w.name, country: w.countryCode })),
+  ].slice(0, 8);
+
   const handleDateChange = (depart: string, ret: string) => {
     setCheckInDate(depart);
+    // NU face fallback pe `depart` aici (era `ret || depart`) — asta bloca
+    // alegerea datei de întoarcere: după primul click, checkOutDate devenea
+    // egal cu checkInDate, iar DateRangePicker credea că intervalul e deja
+    // complet și pornea un interval nou la fiecare click în loc să-l încheie.
     setCheckOutDate(ret);
   };
 
@@ -156,6 +204,11 @@ export default function TripSearchBar() {
         setError('Alege datele sejurului.');
         return;
       }
+
+      // Rezultatele rămân mereu pe site-ul nostru: pentru orașele cu id
+      // Agoda verificat afișăm cardurile noastre cu date live; pentru
+      // restul, pagina de rezultate explică limitarea în loc să te scoată
+      // pe agoda.com cu o potrivire ghicită (vezi CazareCautaPage.tsx).
       navigate('/cazare-cauta', {
         state: {
           agodaCityId: selectedDest.agodaCityId,
@@ -178,6 +231,11 @@ export default function TripSearchBar() {
       return;
     }
 
+    if (tab === 'last-minute') {
+      navigate('/last-minute');
+      return;
+    }
+
     // cars
     navigate('/rent-a-car');
   };
@@ -185,24 +243,27 @@ export default function TripSearchBar() {
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-card-hover border border-slate-200 p-4 sm:p-5">
       {/* Tabs */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4">
+      <div className="mb-4 flex flex-wrap items-center justify-start gap-2 border-b border-slate-100 pb-4">
         {TABS.map(({ key, label, icon: Icon }) => {
           const active = tab === key;
+          const tabStyle = TAB_STYLES[key];
           return (
             <button
               key={key}
               type="button"
               onClick={() => { setTab(key); setError(''); }}
-              className="flex flex-col items-center gap-1.5 group"
+              className={`group flex items-center gap-2 rounded-xl px-3 py-2 text-left transition-colors ${
+                active ? tabStyle.active : 'text-slate-600 hover:bg-slate-50'
+              }`}
             >
               <span
-                className={`flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${
-                  active ? 'bg-cta-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+                  active ? tabStyle.active : tabStyle.icon
                 }`}
               >
                 <Icon className="h-5 w-5" />
               </span>
-              <span className={`text-xs font-semibold ${active ? 'text-slate-900' : 'text-slate-500'}`}>{label}</span>
+              <span className={`text-xs font-semibold ${active ? 'text-slate-900' : 'text-slate-600'}`}>{label}</span>
             </button>
           );
         })}
@@ -231,6 +292,16 @@ export default function TripSearchBar() {
         </div>
       )}
 
+      {tab === 'last-minute' && (
+        <div className="flex min-h-14 items-center justify-between gap-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-bold text-slate-800">Oferte de ultim moment</p>
+            <p className="text-xs text-slate-500">Descoperă plecări avantajoase, actualizate de partenerii noștri.</p>
+          </div>
+          <Zap className="h-5 w-5 shrink-0 text-amber-500" />
+        </div>
+      )}
+
       {/* Fields row */}
       <div className="rounded-xl border border-slate-200 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-slate-200 overflow-visible">
         {tab === 'hotels' && (
@@ -243,9 +314,9 @@ export default function TripSearchBar() {
                   <input
                     type="text"
                     value={destQuery}
-                    onFocus={() => setDestOpen(true)}
+                    onFocus={() => { setDestOpen(true); preloadWorldCities(); }}
                     onChange={(e) => { setDestQuery(e.target.value); setSelectedDest(null); setDestOpen(true); }}
-                    placeholder="Unde vrei să mergi?"
+                    placeholder="Orice oraș din lume"
                     className="block w-full truncate text-sm font-semibold text-slate-800 bg-transparent focus:outline-none placeholder:font-normal placeholder:text-slate-400"
                     autoComplete="off"
                   />
@@ -253,14 +324,9 @@ export default function TripSearchBar() {
               </div>
               {destOpen && (
                 <div className="absolute z-30 mt-1 left-0 right-0 max-h-64 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
-                  {destLoading && (
-                    <p className="px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" /> Căutăm orașe...
-                    </p>
-                  )}
-                  {!destLoading && destResults.length > 0 && destResults.map((d) => (
+                  {filteredDestinations.length > 0 ? filteredDestinations.map((d) => (
                     <button
-                      key={d.agodaCityId}
+                      key={`${d.city}-${d.country}`}
                       type="button"
                       onClick={() => { setSelectedDest(d); setDestQuery(d.city); setDestOpen(false); setError(''); }}
                       className="w-full text-left px-4 py-2.5 hover:bg-brand-50 flex items-center justify-between gap-2"
@@ -268,9 +334,10 @@ export default function TripSearchBar() {
                       <span className="text-sm font-medium text-slate-800">{d.city}</span>
                       <span className="text-xs text-slate-400">{d.country}</span>
                     </button>
-                  ))}
-                  {!destLoading && destResults.length === 0 && (
-                    <p className="px-4 py-3 text-sm text-slate-400">Niciun oraș găsit.</p>
+                  )) : (
+                    <p className="px-4 py-3 text-sm text-slate-400">
+                      {destQuery.trim().length < 3 ? 'Scrie cel puțin 3 litere.' : 'Niciun oraș găsit.'}
+                    </p>
                   )}
                 </div>
               )}

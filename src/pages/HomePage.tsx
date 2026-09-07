@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Bell,
   ArrowRight,
   Search,
   Filter,
@@ -68,48 +67,24 @@ export default function HomePage() {
       ========================================================= */}
       <section className="relative bg-navy-600 dark:bg-navy-900">
 
-        <div className="container-page relative pt-8 pb-20 sm:pt-10 sm:pb-24 lg:pt-12 lg:pb-28">
+        <div className="container-page relative pt-12 pb-24 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32">
 
           {/* Hero text */}
           <div className="max-w-3xl">
 
-            <h1 className="animate-slide-up text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl lg:text-5xl">
-              Vacanță în banii tăi
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-brand-200">
+              Planifică mai simplu. Călătorește mai mult.
+            </p>
+            <h1 className="animate-slide-up text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Găsește-ți următoarea vacanță
             </h1>
 
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-navy-100 sm:text-base">
-              Spune-ne de unde pleci, cât vrei să cheltuiești și când vrei să
-              călătorești. Noi îți găsim variantele care se potrivesc bugetului
-              tău.
-            </p>
-
-          </div>
-
-          {/* Quick category pills */}
-          <div className="mt-6 flex flex-wrap gap-2 animate-fade-in">
-            {[
-              { label: 'Mare', emoji: '🏖️' },
-              { label: 'Munte', emoji: '⛰️' },
-              { label: 'City-break', emoji: '🏙️' },
-              { label: 'All-inclusive', emoji: '🍹' },
-              { label: 'Weekend', emoji: '🧳' },
-            ].map((cat) => (
-              <Link
-                key={cat.label}
-                to="/oferte"
-                state={{ trip_type: cat.label === 'Mare' ? 'beach' : undefined }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:text-sm"
-              >
-                <span>{cat.emoji}</span>
-                {cat.label}
-              </Link>
-            ))}
           </div>
         </div>
 
         {/* Search box — overlaps the navy band and the white section below */}
-        <div className="container-page relative z-10 -mt-14 pb-2 sm:-mt-16">
-          <div className="mx-auto max-w-7xl animate-fade-in">
+        <div className="container-page relative z-10 -mt-16 pb-2 sm:-mt-20">
+          <div className="mx-auto max-w-5xl animate-fade-in">
             <TripSearchBar />
           </div>
 
@@ -256,46 +231,6 @@ export default function HomePage() {
           </div>
 
         </div>
-      </section>
-
-
-      {/* =========================================================
-          ALERT CTA
-      ========================================================= */}
-      <section className="container-page py-14 sm:py-16 lg:py-20">
-
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-600 via-brand-600 to-brand-700 px-6 py-12 text-center shadow-xl sm:px-12 sm:py-16">
-
-          {/* Decorative circles */}
-          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
-
-          <div className="relative mx-auto max-w-2xl">
-
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white/15 text-white backdrop-blur mb-5">
-              <Bell className="h-7 w-7" />
-            </div>
-
-            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-              Nu vrei să cauți în fiecare zi?
-            </h2>
-
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-brand-50 sm:text-base">
-              Creează o alertă și te anunțăm când apare o ofertă care se
-              potrivește criteriilor tale.
-            </p>
-
-            <Link
-              to="/alerte"
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 font-bold text-brand-700 shadow-lg transition-all hover:-translate-y-0.5 hover:bg-brand-50 hover:shadow-xl"
-            >
-              <Bell className="h-5 w-5" />
-              CREEAZĂ O ALERTĂ
-            </Link>
-
-          </div>
-        </div>
-
       </section>
 
 

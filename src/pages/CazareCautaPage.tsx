@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Loader2, Star, Coffee, ExternalLink, AlertTriangle, ChevronLeft } from 'lucide-react';
+import { Loader2, Star, Coffee, ExternalLink, AlertTriangle, ChevronLeft, MapPinOff } from 'lucide-react';
 import { agodaService } from '@/services/agodaService';
 import { transformAgodaResultsToOffers } from '@/utils/agodaTransformer';
 import { formatPrice, formatDate } from '@/utils/pricing';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
+import { DESTINATIONS } from '@/data/destinations';
 import type { Offer } from '@/types';
 
 interface LocationState {
-  agodaCityId: number;
+  agodaCityId?: number;
   destinationName: string;
   country: string;
   checkInDate: string;
@@ -16,6 +17,10 @@ interface LocationState {
   adults: number;
   children: number;
 }
+
+// Destinații pentru care avem deja căutare live, sugerate ca alternativă
+// atunci când orașul ales încă nu are un id Agoda verificat.
+const LIVE_ALTERNATIVES = DESTINATIONS.filter((d) => d.agodaCityId);
 
 export default function CazareCautaPage() {
   const location = useLocation();
@@ -34,6 +39,14 @@ export default function CazareCautaPage() {
   useEffect(() => {
     if (!state) {
       navigate('/', { replace: true });
+      return;
+    }
+
+    // Fără un id Agoda verificat pentru orașul ăsta nu putem apela căutarea
+    // live (API-ul Agoda cere obligatoriu un id numeric de oraș) — afișăm
+    // direct mesajul de mai jos, fără să mai încercăm un apel API.
+    if (!state.agodaCityId) {
+      setLoading(false);
       return;
     }
 
@@ -91,14 +104,57 @@ export default function CazareCautaPage() {
         {state.children ? `, ${state.children} ${state.children === 1 ? 'copil' : 'copii'}` : ''}
       </p>
 
-      {loading && (
+      {!state.agodaCityId && (
+        <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+          <div className="flex items-start gap-3">
+            <MapPinOff className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" />
+            <div>
+              <p className="font-semibold text-slate-800">
+                Nu avem încă rezultate live pentru {state.destinationName}.
+              </p>
+              <p className="mt-1.5 text-sm text-slate-500">
+                Căutarea live e disponibilă deocamdată doar pentru destinațiile de mai jos — le extindem constant.
+              </p>
+            </div>
+          </div>
+
+          {LIVE_ALTERNATIVES.length > 0 && (
+            <div className="mt-5 flex flex-wrap gap-2">
+              {LIVE_ALTERNATIVES.map((d) => (
+                <button
+                  key={d.iata}
+                  type="button"
+                  onClick={() =>
+                    navigate('/cazare-cauta', {
+                      state: {
+                        agodaCityId: d.agodaCityId,
+                        destinationName: d.city,
+                        country: d.country,
+                        checkInDate: state.checkInDate,
+                        checkOutDate: state.checkOutDate,
+                        adults: state.adults,
+                        children: state.children,
+                      },
+                    })
+                  }
+                  className="rounded-full border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-700 hover:border-cta-500 hover:text-cta-600 transition-colors"
+                >
+                  {d.city}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {state.agodaCityId && loading && (
         <div className="flex flex-col items-center justify-center gap-3 py-24 text-slate-400">
           <Loader2 className="h-8 w-8 animate-spin text-cta-500" />
           <p className="text-sm">Căutăm cele mai bune oferte pe Agoda...</p>
         </div>
       )}
 
-      {!loading && error && (
+      {state.agodaCityId && !loading && error && (
         <div className="mt-8 flex items-start gap-3 rounded-xl border border-error-100 bg-error-50 p-5 text-sm text-error-700">
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
@@ -108,13 +164,13 @@ export default function CazareCautaPage() {
         </div>
       )}
 
-      {!loading && !error && offers.length === 0 && (
+      {state.agodaCityId && !loading && !error && offers.length === 0 && (
         <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-8 text-center text-slate-500">
           Nu am găsit cazări disponibile pentru această destinație și aceste date. Încearcă alte date.
         </div>
       )}
 
-      {!loading && !error && offers.length > 0 && (
+      {state.agodaCityId && !loading && !error && offers.length > 0 && (
         <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {offers.map((offer) => (
             <a
