@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Zap } from 'lucide-react';
+import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Zap, Flame } from 'lucide-react';
 import DateRangePicker from './DateRangePicker';
 import { DESTINATIONS, normalize } from '@/data/destinations';
 import { DEPARTURE_CITIES } from './SearchForm';
@@ -21,25 +21,25 @@ const TABS: { key: Tab; label: string; icon: typeof Plane }[] = [
   { key: 'hotels', label: 'Hotel', icon: BedDouble },
   { key: 'flights', label: 'Bilete avion', icon: Plane },
   { key: 'cars', label: 'Rent a car', icon: Car },
-  { key: 'last-minute', label: 'Last minute', icon: Zap },
+  { key: 'last-minute', label: 'Last minute', icon: Flame },
 ];
 
 const TAB_STYLES: Record<Tab, { icon: string; active: string }> = {
   hotels: {
-    icon: 'bg-sky-50 text-sky-700 group-hover:bg-sky-100',
-    active: 'bg-sky-100 text-sky-900 ring-1 ring-sky-200',
+    icon: 'bg-slate-100 text-slate-600 group-hover:bg-slate-200',
+    active: 'bg-slate-200 text-slate-900 ring-1 ring-slate-300',
   },
   flights: {
-    icon: 'bg-violet-50 text-violet-700 group-hover:bg-violet-100',
-    active: 'bg-violet-100 text-violet-900 ring-1 ring-violet-200',
+    icon: 'bg-slate-100 text-slate-600 group-hover:bg-slate-200',
+    active: 'bg-slate-200 text-slate-900 ring-1 ring-slate-300',
   },
   cars: {
-    icon: 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100',
-    active: 'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200',
+    icon: 'bg-slate-100 text-slate-600 group-hover:bg-slate-200',
+    active: 'bg-slate-200 text-slate-900 ring-1 ring-slate-300',
   },
   'last-minute': {
-    icon: 'bg-amber-50 text-amber-700 group-hover:bg-amber-100',
-    active: 'bg-amber-100 text-amber-900 ring-1 ring-amber-200',
+    icon: 'bg-slate-100 text-orange-600 group-hover:bg-slate-200',
+    active: 'bg-slate-200 text-slate-900 ring-1 ring-slate-300',
   },
 };
 
@@ -241,7 +241,7 @@ export default function TripSearchBar() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-card-hover border border-slate-200 p-4 sm:p-5">
+    <form onSubmit={handleSubmit} className="rounded-2xl border border-white/70 bg-[#fffdf8] p-4 shadow-[0_18px_50px_rgba(3,24,54,0.22)] sm:p-5">
       {/* Tabs */}
       <div className="mb-4 flex flex-wrap items-center justify-start gap-2 border-b border-slate-100 pb-4">
         {TABS.map(({ key, label, icon: Icon }) => {
@@ -303,7 +303,7 @@ export default function TripSearchBar() {
       )}
 
       {/* Fields row */}
-      <div className="rounded-xl border border-slate-200 flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-slate-200 overflow-visible">
+      <div className="flex flex-col divide-y divide-[#dbe7e8] overflow-visible rounded-xl border border-[#cfe0e1] bg-white/80 sm:flex-row sm:divide-x sm:divide-y-0">
         {tab === 'hotels' && (
           <>
             <div ref={destWrapperRef} className="relative flex-[1.4] min-w-[200px]">

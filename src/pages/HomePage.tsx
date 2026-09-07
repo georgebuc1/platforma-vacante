@@ -63,9 +63,17 @@ export default function HomePage() {
     <div className="bg-white dark:bg-slate-950">
 
       {/* =========================================================
-          HERO — solid navy band, Booking.com style
+          HERO — Santorini background with a readable dark overlay
       ========================================================= */}
-      <section className="relative bg-navy-600 dark:bg-navy-900">
+      <section className="relative overflow-hidden bg-navy-600 dark:bg-navy-900">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, rgba(3, 24, 54, 0.46) 0%, rgba(3, 24, 54, 0.12) 42%, rgba(3, 24, 54, 0.32) 100%), linear-gradient(90deg, rgba(3, 24, 54, 0.9) 0%, rgba(3, 24, 54, 0.68) 46%, rgba(3, 24, 54, 0.42) 100%), url('/panoramic%20view%20of%20santorini%20greece_15752389.jpg')",
+          }}
+        />
 
         <div className="container-page relative pt-12 pb-24 sm:pt-16 sm:pb-28 lg:pt-20 lg:pb-32">
 
