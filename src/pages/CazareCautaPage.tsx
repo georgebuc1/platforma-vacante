@@ -91,15 +91,15 @@ export default function CazareCautaPage() {
 
   return (
     <div className="container-page py-8 sm:py-10">
-      <Link to="/" className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-cta-600 mb-4">
+      <Link to="/" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-cta-600 dark:text-slate-400 dark:hover:text-sky-300">
         <ChevronLeft className="h-4 w-4" />
         Înapoi
       </Link>
 
-      <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+      <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 sm:text-3xl">
         Cazări în {state.destinationName}
       </h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
         {formatDate(state.checkInDate)} — {formatDate(state.checkOutDate)} · {state.adults} {state.adults === 1 ? 'adult' : 'adulți'}
         {state.children ? `, ${state.children} ${state.children === 1 ? 'copil' : 'copii'}` : ''}
       </p>
@@ -178,9 +178,9 @@ export default function CazareCautaPage() {
               href={offer.offer_url}
               target="_blank"
               rel="noopener noreferrer sponsored"
-              className="card overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+              className="card flex flex-col overflow-hidden border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600 dark:hover:shadow-2xl"
             >
-              <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+              <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 dark:bg-slate-800">
                 <img
                   src={offer.main_image_url}
                   alt={offer.hotel_name || offer.title}
@@ -188,26 +188,26 @@ export default function CazareCautaPage() {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <div className="flex flex-col flex-1 p-4">
-                <div className="flex items-center gap-1 text-xs text-slate-500">
+              <div className="flex flex-1 flex-col p-4">
+                <div className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
                   {Array.from({ length: Math.round(offer.hotel_stars || 0) }).map((_, i) => (
                     <Star key={i} className="h-3.5 w-3.5 fill-accent-400 text-accent-400" />
                   ))}
                 </div>
-                <h3 className="mt-1 font-bold text-slate-900 line-clamp-2">{offer.hotel_name || offer.title}</h3>
-                <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
+                <h3 className="mt-1 line-clamp-2 font-bold text-slate-900 dark:text-slate-100">{offer.hotel_name || offer.title}</h3>
+                <div className="mt-2 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                   {offer.meal_type === 'mic_dejun' && (
                     <span className="flex items-center gap-1"><Coffee className="h-3.5 w-3.5" />Mic dejun inclus</span>
                   )}
                 </div>
-                <div className="mt-auto pt-4 flex items-end justify-between">
+                <div className="mt-auto flex items-end justify-between pt-4">
                   <div>
-                    <div className="text-lg font-extrabold text-cta-600">
+                    <div className="text-lg font-extrabold text-cta-600 dark:text-sky-300">
                       {formatPrice(offer.total_price, offer.currency)}
                     </div>
-                    <div className="text-[11px] text-slate-400">total sejur</div>
+                    <div className="text-[11px] text-slate-400 dark:text-slate-500">total sejur</div>
                   </div>
-                  <span className="flex items-center gap-1 text-sm font-semibold text-cta-600">
+                  <span className="flex items-center gap-1 text-sm font-semibold text-cta-600 dark:text-sky-300">
                     Vezi <ExternalLink className="h-3.5 w-3.5" />
                   </span>
                 </div>
