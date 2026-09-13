@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage } from 'lucide-react';
+import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Zap } from 'lucide-react';
 import DateRangePicker from './DateRangePicker';
 import { DESTINATIONS, normalize } from '@/data/destinations';
 import { DEPARTURE_CITIES } from './SearchForm';
 import { preloadWorldCities, searchWorldCities, type WorldCity } from '@/utils/worldCities';
 
-type Tab = 'flights' | 'hotels' | 'cars';
+type Tab = 'hotels' | 'flights' | 'cars' | 'last-minute';
 
 /** Destinația aleasă în câmpul "Destinație", indiferent dacă vine din lista
  * noastră curată (cu id Agoda verificat, eventual) sau din datasetul mondial
@@ -18,10 +18,30 @@ interface SelectedDestination {
 }
 
 const TABS: { key: Tab; label: string; icon: typeof Plane }[] = [
+  { key: 'hotels', label: 'Hotel', icon: BedDouble },
   { key: 'flights', label: 'Bilete avion', icon: Plane },
-  { key: 'hotels', label: 'Cazări', icon: BedDouble },
-  { key: 'cars', label: 'Mașini', icon: Car },
+  { key: 'cars', label: 'Rent a car', icon: Car },
+  { key: 'last-minute', label: 'Last minute', icon: Zap },
 ];
+
+const TAB_STYLES: Record<Tab, { icon: string; active: string }> = {
+  hotels: {
+    icon: 'bg-sky-50 text-sky-700 group-hover:bg-sky-100',
+    active: 'bg-sky-100 text-sky-900 ring-1 ring-sky-200',
+  },
+  flights: {
+    icon: 'bg-violet-50 text-violet-700 group-hover:bg-violet-100',
+    active: 'bg-violet-100 text-violet-900 ring-1 ring-violet-200',
+  },
+  cars: {
+    icon: 'bg-emerald-50 text-emerald-700 group-hover:bg-emerald-100',
+    active: 'bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200',
+  },
+  'last-minute': {
+    icon: 'bg-amber-50 text-amber-700 group-hover:bg-amber-100',
+    active: 'bg-amber-100 text-amber-900 ring-1 ring-amber-200',
+  },
+};
 
 function defaultCheckIn(): string {
   const d = new Date();
@@ -211,6 +231,11 @@ export default function TripSearchBar() {
       return;
     }
 
+    if (tab === 'last-minute') {
+      navigate('/last-minute');
+      return;
+    }
+
     // cars
     navigate('/rent-a-car');
   };
@@ -218,24 +243,27 @@ export default function TripSearchBar() {
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-card-hover border border-slate-200 p-4 sm:p-5">
       {/* Tabs */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4">
+      <div className="mb-4 flex flex-wrap items-center justify-start gap-2 border-b border-slate-100 pb-4">
         {TABS.map(({ key, label, icon: Icon }) => {
           const active = tab === key;
+          const tabStyle = TAB_STYLES[key];
           return (
             <button
               key={key}
               type="button"
               onClick={() => { setTab(key); setError(''); }}
-              className="flex flex-col items-center gap-1.5 group"
+              className={`group flex items-center gap-2 rounded-xl px-3 py-2 text-left transition-colors ${
+                active ? tabStyle.active : 'text-slate-600 hover:bg-slate-50'
+              }`}
             >
               <span
-                className={`flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${
-                  active ? 'bg-cta-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${
+                  active ? tabStyle.active : tabStyle.icon
                 }`}
               >
                 <Icon className="h-5 w-5" />
               </span>
-              <span className={`text-xs font-semibold ${active ? 'text-slate-900' : 'text-slate-500'}`}>{label}</span>
+              <span className={`text-xs font-semibold ${active ? 'text-slate-900' : 'text-slate-600'}`}>{label}</span>
             </button>
           );
         })}
@@ -261,6 +289,16 @@ export default function TripSearchBar() {
               {[0, 1, 2, 3].map((n) => <option key={n} value={n}>{n} {n === 1 ? 'bagaj' : 'bagaje'}</option>)}
             </select>
           </div>
+        </div>
+      )}
+
+      {tab === 'last-minute' && (
+        <div className="flex min-h-14 items-center justify-between gap-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-bold text-slate-800">Oferte de ultim moment</p>
+            <p className="text-xs text-slate-500">Descoperă plecări avantajoase, actualizate de partenerii noștri.</p>
+          </div>
+          <Zap className="h-5 w-5 shrink-0 text-amber-500" />
         </div>
       )}
 

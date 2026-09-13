@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useOptionalConsent } from '@/hooks/useOptionalConsent';
 
 /**
  * Embeds the Kiwi.com "flight search" widget (via Travelpayouts/tpemb.com).
@@ -9,10 +10,11 @@ import { useEffect, useRef } from 'react';
  */
 export default function KiwiFlightWidget() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const consent = useOptionalConsent();
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || !consent) return;
 
     const script = document.createElement('script');
     script.async = true;
@@ -25,7 +27,7 @@ export default function KiwiFlightWidget() {
     return () => {
       container.innerHTML = '';
     };
-  }, []);
+  }, [consent]);
 
-  return <div ref={containerRef} className="kiwi-widget-container w-full" />;
+  return consent ? <div ref={containerRef} className="kiwi-widget-container w-full" /> : <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">Activează cookie-urile opționale pentru a încărca instrumentul de căutare.</p>;
 }

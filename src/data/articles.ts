@@ -346,6 +346,48 @@ export const ARTICLES: Article[] = [
       },
     ],
   },
+  {
+    slug: 'vacante-accesibile-romania-2026-idei-buget',
+    title: 'Vacanțe accesibile din România în 2026: idei bune pentru fiecare buget',
+    metaDescription:
+      'Idei actuale pentru vacanțe accesibile în 2026, cu plecare din România: litoral, city break, all-inclusive și escapade de weekend.',
+    destination: 'România și Europa',
+    heroImage: 'https://images.unsplash.com/photo-1500534623283-312a8f0a7d1c?w=1200',
+    publishedAt: '2026-09-07',
+    intro:
+      'O vacanță reușită nu începe cu alegerea unui hotel scump, ci cu o combinație realistă între perioadă, transport și activități. Pentru turiștii din România, 2026 aduce mai multe opțiuni dacă rezervarea este gândită pe bugetul total, nu doar pe prețul biletului.',
+    sections: [
+      {
+        heading: 'Alege perioada înaintea destinației',
+        paragraphs: [
+          'Iunie și septembrie sunt adesea mai ușor de echilibrat decât vârful de sezon: vremea rămâne potrivită pentru mare, iar zborurile și cazarea pot fi mai flexibile. Pentru un buget fix, caută mai întâi două sau trei săptămâni posibile și compară destinațiile disponibile în acele intervale.',
+          'Un alt truc simplu este să compari plecările din mai multe aeroporturi. Bucureștiul are de obicei cea mai largă ofertă, dar Cluj-Napoca, Timișoara, Iași sau Sibiu pot deveni mai convenabile dacă diferența de preț compensează transportul până la aeroport.',
+        ],
+      },
+      {
+        heading: 'Trei tipuri de vacanță care merită comparate',
+        paragraphs: [
+          'Pentru relaxare și un buget ușor de urmărit, un pachet all-inclusive în Turcia, Egipt sau Grecia poate fi mai simplu decât rezervarea separată a fiecărui serviciu. Verifică însă ce include oferta: transferul, bagajul, băuturile și activitățile pot schimba prețul final.',
+          'Un city break de trei sau patru nopți funcționează bine când alegi cazare aproape de transportul public și îți rezervi din timp obiectivele cu intrare. Barcelona, Atena, Lisabona, Roma și Budapesta rămân opțiuni ușor de construit, dar merită comparate și orașe mai puțin aglomerate.',
+          'Pentru weekend, România este adesea cea mai eficientă alegere: Brașov, Sibiu, Oradea, Delta Dunării sau Bucovina pot oferi experiențe diferite fără costul și timpul unui zbor.',
+        ],
+      },
+      {
+        heading: 'Cum compari corect prețul total',
+        paragraphs: [
+          'Notează într-un singur tabel transportul, cazarea, bagajele, transferul, mesele și activitățile. O ofertă aparent ieftină poate deveni mai scumpă după adăugarea bagajului sau a transferului de la aeroport.',
+          'Pe Vacanța Mea poți porni de la bugetul total și apoi verifica separat zborul, cazarea și mașina de închiriat. Prețurile și disponibilitatea se pot schimba, așa că verifică întotdeauna condițiile finale la furnizor înainte de plată.',
+        ],
+      },
+      {
+        heading: 'Checklist înainte de rezervare',
+        paragraphs: [
+          'Verifică documentele de călătorie și condițiile de intrare pe surse oficiale, citește politica de anulare și confirmă moneda în care se face plata. Pentru mașini, uită-te la depozit, asigurare, kilometraj și vârsta minimă a șoferului.',
+          'Dacă pleci în sezon aglomerat, salvează două variante comparabile și setează o alertă de preț. Flexibilitatea de o zi la plecare sau la întoarcere poate face diferența dintre o vacanță posibilă și una care depășește bugetul.',
+        ],
+      },
+    ],
+  },
 ];
 
 export function getArticleBySlug(slug: string): Article | undefined {

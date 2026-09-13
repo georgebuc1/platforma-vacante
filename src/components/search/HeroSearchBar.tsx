@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useOptionalConsent } from '@/hooks/useOptionalConsent';
 
 interface AgodaSherpaConfig {
   crt: string;
@@ -53,7 +54,10 @@ function initializeAgoda() {
 }
 
 export default function HeroSearchBar() {
+  const consent = useOptionalConsent();
+
   useEffect(() => {
+    if (!consent) return;
     // Agoda's generated widget code is script-based. Load it once and
     // initialize the widget after the external library becomes available.
     const existingScript = document.getElementById(AGODA_SCRIPT_ID) as HTMLScriptElement | null;
@@ -79,10 +83,11 @@ export default function HeroSearchBar() {
     return () => {
       script.onload = null;
     };
-  }, []);
+  }, [consent]);
 
   return (
     <div className="w-full overflow-x-auto rounded-lg [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {!consent && <p className="p-4 text-sm text-slate-500">Activează cookie-urile opționale pentru a încărca motorul de căutare.</p>}
       <div
         id={AGODA_CONTAINER_ID}
         className="mx-auto min-w-[900px]"

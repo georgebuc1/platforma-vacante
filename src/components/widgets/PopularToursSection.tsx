@@ -10,7 +10,7 @@ export default function PopularToursSection() {
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
       <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-4 sm:p-6">
         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
-          Ce poți face acolo
+          Destinații populare acum
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
           Excursii și activități reale, via Klook — prețuri actualizate chiar acum.

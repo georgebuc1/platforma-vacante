@@ -79,9 +79,7 @@ export class OfferSyncService {
       for (const destination of destinations) {
         try {
           console.log(`Syncing offers for destination: ${destination}`);
-          console.log('Travelpayouts API key present:', !!travelpayoutsService.apiKey, 'key length:', travelpayoutsService.apiKey?.length);
-
-          if (!travelpayoutsService.apiKey) {
+          if (!travelpayoutsService.isConfigured) {
             console.warn('Travelpayouts API key not configured - skipping API calls');
             // For testing purposes when no API key, we'll use simulated data
             // But since we have a key in .env, this shouldn't happen
@@ -366,7 +364,7 @@ export class OfferSyncService {
         transport_type: 'avion',
         meal_type: 'mic_dejun',
         accommodation_included: true,
-        hotel_name: f`Hotel {destination} Center`,
+        hotel_name: `Hotel ${destination} Center`,
         hotel_stars: 4,
         trip_types: ['city_break', 'weekend'],
         provider_name: 'TravelDemo',

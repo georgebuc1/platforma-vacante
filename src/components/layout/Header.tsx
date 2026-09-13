@@ -8,17 +8,18 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 // Ghiduri are genuine features Booking doesn't have, so they're appended
 // after a visual divider rather than dropped.
 const NAV_LINKS = [
-  { to: '/cazari', label: 'Sejururi', icon: BedDouble },
-  { to: '/bilete', label: 'Zboruri', icon: Plane },
-  { to: '/zbor-hotel', label: 'Zbor + Hotel', icon: Luggage },
-  { to: '/rent-a-car', label: 'Închirieri auto', icon: Car },
-  { to: '/atractii', label: 'Atracții', icon: Ticket },
-  { to: '/taxiuri-aeroport', label: 'Taxiuri aeroport', icon: CarTaxiFront },
+  { to: '/cazari', label: 'Hotel', icon: BedDouble },
+  { to: '/bilete', label: 'Bilete de avion', icon: Plane },
+  { to: '/rent-a-car', label: 'Rent a car', icon: Car },
+  { to: '/last-minute', label: 'Last minute', icon: Zap },
+  { to: '/atractii', label: 'Explore', icon: Ticket },
+  { to: '/oferte', label: 'Trips', icon: Luggage },
+  { to: '/ghiduri', label: 'Experiențe de călătorie', icon: BookOpen },
 ];
 
 const EXTRA_LINKS = [
-  { to: '/last-minute', label: 'Last minute', icon: Zap },
-  { to: '/ghiduri', label: 'Ghiduri', icon: BookOpen },
+  { to: '/zbor-hotel', label: 'Zbor + Hotel', icon: Luggage },
+  { to: '/taxiuri-aeroport', label: 'Taxiuri aeroport', icon: CarTaxiFront },
 ];
 
 export default function Header() {
@@ -30,20 +31,34 @@ export default function Header() {
       <div className="container-page">
         <div className="flex h-16 items-center justify-between gap-4">
 
-          {/* Logo */}
-          <Link
-            to="/"
-            className="flex items-center gap-2 shrink-0"
-            onClick={() => setMobileOpen(false)}
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-navy-700">
-              <Plane className="h-5 w-5" />
-            </span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Meniu"
+            >
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
 
-            <span className="text-lg font-extrabold tracking-tight text-white transition-colors">
-              Vacanța Mea
-            </span>
-          </Link>
+            {/* Logo */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 shrink-0"
+              onClick={() => {
+                setMobileOpen(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-navy-700">
+                <Plane className="h-5 w-5" />
+              </span>
+
+              <span className="text-lg font-extrabold tracking-tight text-white transition-colors">
+                Vacanța Mea
+              </span>
+            </Link>
+          </div>
 
           {/* Dark mode + mobile toggle (desktop nav row is the tab strip below) */}
           <div className="flex items-center gap-2">
@@ -57,14 +72,6 @@ export default function Header() {
 
             <ThemeToggle />
 
-            <button
-              type="button"
-              className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-label="Meniu"
-            >
-              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
           </div>
         </div>
       </div>
