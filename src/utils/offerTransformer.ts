@@ -162,7 +162,6 @@ export function transformToInternalOffer(
       trip_types: Array.isArray(rawOffer.trip_types)
         ? rawOffer.trip_types
             .map((t: string) => TRIP_TYPE_MAPPING[t.toLowerCase()] || 'city_break')
-            .filter((t): t is TripType => t !== undefined)
         : [TRIP_TYPE_MAPPING[(rawOffer.trip_type || 'city_break').toLowerCase()] || 'city_break'],
 
       // Transportation

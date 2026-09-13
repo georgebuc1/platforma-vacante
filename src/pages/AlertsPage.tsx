@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { saveAlert } from '@/services/storageService';
 import {
-  DEPARTURE_CITIES,
   MONTHS,
   DURATIONS,
   TRIP_TYPES,
@@ -21,6 +20,7 @@ import { showToast } from '@/components/common/Toast';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { useHoneypot } from '@/hooks/useHoneypot';
 import type { AlertFrequency } from '@/types';
+import AgodaLocationAutocomplete from '@/components/search/AgodaLocationAutocomplete';
 
 const FREQUENCIES: { value: AlertFrequency; label: string }[] = [
   { value: 'immediate', label: 'Imediat' },
@@ -190,17 +190,12 @@ export default function AlertsPage() {
               <span className="text-error-500">*</span>
             </label>
 
-            <select
+            <AgodaLocationAutocomplete
               value={departureCity}
-              onChange={(e) => setDepartureCity(e.target.value)}
-              className="input-field"
-            >
-              {DEPARTURE_CITIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+              onChange={setDepartureCity}
+              placeholder="Caută orașul de plecare"
+              ariaLabel="Oraș de plecare"
+            />
 
             {errors.departureCity && (
               <p className="mt-1 text-xs text-error-600 dark:text-error-400">

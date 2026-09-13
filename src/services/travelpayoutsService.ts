@@ -42,7 +42,10 @@ export class TravelpayoutsService {
   constructor() {
     this.apiKey = API_CONFIG.travelpayouts.apiKey;
     this.baseUrl = API_CONFIG.travelpayouts.baseUrl;
-    console.log('Travelpayouts API key loaded:', this.apiKey ? this.apiKey.substring(0, 5) + '...' : 'undefined');
+  }
+
+  get isConfigured(): boolean {
+    return Boolean(this.apiKey);
   }
 
   /**

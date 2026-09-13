@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Plane, Search, BedDouble, Luggage, Car, Ticket, CarTaxiFront, Zap, BookOpen } from 'lucide-react';
+import { Menu, X, Plane, Search, BedDouble, Car, Ticket, CarTaxiFront, Zap, BookOpen } from 'lucide-react';
 import ThemeToggle from '@/components/common/ThemeToggle';
 
 // The first 6 mirror Booking.com's own tab bar exactly (name + icon), since
@@ -9,17 +9,14 @@ import ThemeToggle from '@/components/common/ThemeToggle';
 // after a visual divider rather than dropped.
 const NAV_LINKS = [
   { to: '/cazari', label: 'Hotel', icon: BedDouble },
-  { to: '/bilete', label: 'Bilete de avion', icon: Plane },
   { to: '/rent-a-car', label: 'Rent a car', icon: Car },
   { to: '/last-minute', label: 'Last minute', icon: Zap },
   { to: '/atractii', label: 'Explore', icon: Ticket },
-  { to: '/oferte', label: 'Trips', icon: Luggage },
   { to: '/ghiduri', label: 'Experiențe de călătorie', icon: BookOpen },
 ];
 
 const EXTRA_LINKS = [
-  { to: '/zbor-hotel', label: 'Zbor + Hotel', icon: Luggage },
-  { to: '/taxiuri-aeroport', label: 'Taxiuri aeroport', icon: CarTaxiFront },
+  { to: '/taxiuri-aeroport', label: 'Transfer Aeroport', icon: CarTaxiFront },
 ];
 
 export default function Header() {

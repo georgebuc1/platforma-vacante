@@ -5,6 +5,7 @@ import DateRangePicker from './DateRangePicker';
 import { DESTINATIONS, normalize } from '@/data/destinations';
 import { DEPARTURE_CITIES } from './SearchForm';
 import { preloadWorldCities, searchWorldCities, type WorldCity } from '@/utils/worldCities';
+import { searchAgodaCities, type AgodaCityOption } from '@/services/agodaCityLookupService';
 
 type Tab = 'hotels' | 'flights' | 'cars' | 'last-minute';
 
@@ -130,6 +131,7 @@ export default function TripSearchBar() {
   const [selectedDest, setSelectedDest] = useState<SelectedDestination | null>(null);
   const [destOpen, setDestOpen] = useState(false);
   const [worldMatches, setWorldMatches] = useState<WorldCity[]>([]);
+  const [agodaMatches, setAgodaMatches] = useState<AgodaCityOption[]>([]);
   const [checkInDate, setCheckInDate] = useState(defaultCheckIn());
   const [checkOutDate, setCheckOutDate] = useState(defaultCheckOut());
   const destWrapperRef = useRef<HTMLDivElement>(null);
@@ -166,6 +168,26 @@ export default function TripSearchBar() {
     };
   }, [destQuery]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const trimmed = destQuery.trim();
+    if (trimmed.length < 2) {
+      setAgodaMatches([]);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      searchAgodaCities(trimmed, 8).then((matches) => {
+        if (!cancelled) setAgodaMatches(matches);
+      });
+    }, 180);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [destQuery]);
+
   const q = normalize(destQuery.trim());
   const curatedMatches = q
     ? DESTINATIONS.filter((d) => normalize(d.city).includes(q) || normalize(d.country).includes(q))
@@ -177,10 +199,18 @@ export default function TripSearchBar() {
   const worldSuggestions = worldMatches.filter(
     (w) => !curatedMatches.some((d) => normalize(d.city) === normalize(w.name))
   );
+  const agodaSuggestions: SelectedDestination[] = agodaMatches.map((d) => ({
+    city: d.city,
+    country: d.country,
+    agodaCityId: d.agodaCityId,
+  }));
   const filteredDestinations: SelectedDestination[] = [
+    ...agodaSuggestions,
     ...curatedMatches.map((d) => ({ city: d.city, country: d.country, agodaCityId: d.agodaCityId })),
     ...worldSuggestions.map((w) => ({ city: w.name, country: w.countryCode })),
-  ].slice(0, 8);
+  ].filter((d, index, values) =>
+    values.findIndex((candidate) => normalize(candidate.city) === normalize(d.city)) === index
+  ).slice(0, 8);
 
   const handleDateChange = (depart: string, ret: string) => {
     setCheckInDate(depart);

@@ -1,7 +1,11 @@
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
-import TravelpayoutsWidget from '@/components/TravelpayoutsWidget';
+import { useNavigate } from 'react-router-dom';
+import SearchForm from '@/components/search/SearchForm';
+import type { SearchFilters } from '@/types';
 
 export default function ZborHotelPage() {
+  const navigate = useNavigate();
+
   useDocumentMeta(
     'Zbor + Hotel',
     'Caută pachete de zbor și cazare pentru vacanța ta.'
@@ -16,20 +20,24 @@ export default function ZborHotelPage() {
         Pachete combinate — zbor și cazare într-o singură căutare.
       </p>
 
-      <div className="card p-4 sm:p-6 mb-6">
+      <div className="card mb-6 p-4 sm:p-6">
         <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">
-          Caută zboruri și cazări live, în timp real
+          Planifică zborul și cazarea
         </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-          Rezultate directe de la Travelpayouts — prețuri actualizate chiar acum.
+          Alege criteriile, apoi vezi ofertele disponibile în platforma noastră.
         </p>
-        <TravelpayoutsWidget />
+        <SearchForm
+          variant="hero"
+          onSearch={(filters: SearchFilters) =>
+            navigate('/oferte', { state: filters })
+          }
+        />
       </div>
 
-      <div className="rounded-xl border border-warning-100 bg-warning-50 p-4 text-sm text-warning-700 dark:border-warning-900/50 dark:bg-warning-950/30 dark:text-warning-300">
-        <strong>Căutarea combinată de pachete (zbor + hotel într-un singur rezultat) e în lucru.</strong>{' '}
-        Momentan poți căuta zborul mai sus, iar cazarea separat, în secțiunea{' '}
-        <a href="/cazari" className="underline font-semibold">Sejururi</a>.
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+        Rezultatele rămân în site-ul nostru. Pentru oferte live de cazare, folosește secțiunea{' '}
+        <a href="/cazari" className="font-semibold underline">Sejururi</a>.
       </div>
     </div>
   );
