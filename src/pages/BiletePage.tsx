@@ -1,24 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import SearchForm from '@/components/search/SearchForm';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
-import type { SearchFilters } from '@/types';
+import KiwiFlightWidget from '@/components/widgets/KiwiFlightWidget';
 
 export default function BiletePage() {
-  const navigate = useNavigate();
-
   useDocumentMeta(
     'Bilete de avion',
-    'Caută și compară opțiuni de călătorie în cadrul platformei Vacanța Mea.'
+    'Caută bilete de avion prin motorul Kiwi.'
   );
-
-  const handleSearch = (filters: SearchFilters) => {
-    navigate('/oferte', {
-      state: {
-        ...filters,
-        transport_type: 'avion',
-      },
-    });
-  };
 
   return (
     <div className="container-page py-8 sm:py-10">
@@ -27,10 +14,10 @@ export default function BiletePage() {
           Bilete de avion
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400 sm:text-base">
-          Caută opțiuni de vacanță în site-ul nostru, fără redirecționări către pagini externe.
+          Caută și compară bilete de avion cu Kiwi.
         </p>
-        <div className="mt-6">
-          <SearchForm variant="hero" onSearch={handleSearch} />
+        <div className="mt-6 rounded-2xl bg-white p-3 shadow-sm">
+          <KiwiFlightWidget />
         </div>
       </div>
     </div>

@@ -1,18 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Plane, Search, BedDouble, Car, Ticket, CarTaxiFront, Zap, BookOpen } from 'lucide-react';
+import { Menu, X, Plane, Search, BedDouble, Car, CarTaxiFront, Zap } from 'lucide-react';
 import ThemeToggle from '@/components/common/ThemeToggle';
 
-// The first 6 mirror Booking.com's own tab bar exactly (name + icon), since
-// that's the reference the person asked us to match. Last minute and
-// Ghiduri are genuine features Booking doesn't have, so they're appended
-// after a visual divider rather than dropped.
 const NAV_LINKS = [
   { to: '/cazari', label: 'Hotel', icon: BedDouble },
   { to: '/rent-a-car', label: 'Rent a car', icon: Car },
   { to: '/last-minute', label: 'Last minute', icon: Zap },
-  { to: '/atractii', label: 'Explore', icon: Ticket },
-  { to: '/ghiduri', label: 'Experiențe de călătorie', icon: BookOpen },
 ];
 
 const EXTRA_LINKS = [
