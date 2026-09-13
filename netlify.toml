@@ -5,7 +5,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://cloud.umami.is https://tpo.gg https://tpemb.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://cloud.umami.is https://tpo.gg https://tpemb.com https://tp.media; frame-src 'self' https://*.supabase.co; form-action 'self' https://tp.media https://gettransfer.com; upgrade-insecure-requests"
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://cloud.umami.is https://tpo.gg https://tpemb.com https://widgets.kiwi.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://*.supabase.co https://cloud.umami.is https://tpo.gg https://tpemb.com https://tp.media https://widgets.kiwi.com; frame-src 'self' https://*.supabase.co https://widgets.kiwi.com; form-action 'self' https://tp.media https://gettransfer.com https://kiwi.com https://www.kiwi.com; upgrade-insecure-requests"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"

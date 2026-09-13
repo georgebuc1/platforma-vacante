@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, ArrowLeftRight, Luggage, Zap } from 'lucide-react';
+import { Plane, BedDouble, Car, Search, MapPin, Users, Minus, Plus, Zap } from 'lucide-react';
 import DateRangePicker from './DateRangePicker';
+import KiwiFlightWidget from '@/components/widgets/KiwiFlightWidget';
 import { DESTINATIONS, normalize } from '@/data/destinations';
 import { DEPARTURE_CITIES } from './SearchForm';
 import { preloadWorldCities, searchWorldCities, type WorldCity } from '@/utils/worldCities';
@@ -134,11 +135,8 @@ export default function TripSearchBar() {
   const [checkOutDate, setCheckOutDate] = useState(defaultCheckOut());
   const destWrapperRef = useRef<HTMLDivElement>(null);
 
-  // Flights / cars — same round-trip dates, simple from/to
-  const [oneWay, setOneWay] = useState(false);
-  const [bags, setBags] = useState(0);
+  // Cars
   const [fromCity, setFromCity] = useState('București');
-  const [toQuery, setToQuery] = useState('');
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -269,29 +267,6 @@ export default function TripSearchBar() {
         })}
       </div>
 
-      {/* Sub-options row — only meaningful for flights */}
-      {tab === 'flights' && (
-        <div className="flex items-center gap-4 mb-3 text-sm">
-          <button
-            type="button"
-            onClick={() => setOneWay((v) => !v)}
-            className="font-semibold text-slate-700 hover:text-cta-600"
-          >
-            {oneWay ? 'Doar dus' : 'Dus-întors'} ⌄
-          </button>
-          <div className="flex items-center gap-1.5 text-slate-500">
-            <Luggage className="h-4 w-4" />
-            <select
-              value={bags}
-              onChange={(e) => setBags(Number(e.target.value))}
-              className="bg-transparent font-medium text-slate-700 focus:outline-none"
-            >
-              {[0, 1, 2, 3].map((n) => <option key={n} value={n}>{n} {n === 1 ? 'bagaj' : 'bagaje'}</option>)}
-            </select>
-          </div>
-        </div>
-      )}
-
       {tab === 'last-minute' && (
         <div className="flex min-h-14 items-center justify-between gap-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3">
           <div>
@@ -351,41 +326,7 @@ export default function TripSearchBar() {
           </>
         )}
 
-        {tab === 'flights' && (
-          <>
-            <div className="flex-1 min-w-[160px] flex items-center gap-2.5 px-4 h-14">
-              <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <label className="block text-[11px] font-medium text-slate-500 leading-tight">De unde?</label>
-                <select value={fromCity} onChange={(e) => setFromCity(e.target.value)} className="block w-full text-sm font-semibold text-slate-800 bg-transparent focus:outline-none">
-                  {DEPARTURE_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-            <div className="flex items-center justify-center px-1 sm:px-0">
-              <span className="hidden sm:flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-400">
-                <ArrowLeftRight className="h-3.5 w-3.5" />
-              </span>
-            </div>
-            <div className="flex-1 min-w-[160px] flex items-center gap-2.5 px-4 h-14">
-              <MapPin className="h-4 w-4 text-slate-400 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <label className="block text-[11px] font-medium text-slate-500 leading-tight">Spre unde?</label>
-                <input
-                  type="text"
-                  value={toQuery}
-                  onChange={(e) => setToQuery(e.target.value)}
-                  placeholder="Orice destinație"
-                  className="block w-full text-sm font-semibold text-slate-800 bg-transparent focus:outline-none placeholder:font-normal placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-            <div className="flex-1 min-w-[220px]">
-              <DateRangePicker departDate={checkInDate} returnDate={oneWay ? '' : checkOutDate} onChange={handleDateChange} />
-            </div>
-            <GuestsPicker adults={adults} children={children} onChange={(a, c) => { setAdults(a); setChildren(c); }} />
-          </>
-        )}
+        {tab === 'flights' && <KiwiFlightWidget />}
 
         {tab === 'cars' && (
           <>
@@ -404,10 +345,12 @@ export default function TripSearchBar() {
           </>
         )}
 
-        <button type="submit" className="btn-primary rounded-none sm:rounded-r-xl px-6 h-14 sm:h-auto shrink-0">
-          <Search className="h-5 w-5" />
-          CAUTĂ
-        </button>
+        {tab !== 'flights' && (
+          <button type="submit" className="btn-primary rounded-none sm:rounded-r-xl px-6 h-14 sm:h-auto shrink-0">
+            <Search className="h-5 w-5" />
+            CAUTĂ
+          </button>
+        )}
       </div>
 
       {error && <p className="mt-2 text-xs text-error-600">{error}</p>}

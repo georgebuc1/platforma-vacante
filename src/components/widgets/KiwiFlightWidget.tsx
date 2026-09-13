@@ -20,7 +20,7 @@ export default function KiwiFlightWidget() {
     script.async = true;
     script.charset = 'utf-8';
     script.src =
-      'https://tpemb.com/content?currency=eur&trs=565952&shmarker=769203.769203&locale=ro&powered_by=true&limit=4&primary_color=00AE98&results_background_color=FFFFFF&form_background_color=FFFFFF&promo_id=4563&campaign_id=111';
+      'https://tpemb.com/content?currency=eur&trs=565952&shmarker=769203.769203&powered_by=true&locale=ro&show_header=false&limit=3&primary_color=0063AEff&results_background_color=FFFFFF&form_background_color=FFFFFF&campaign_id=111&promo_id=4478';
 
     container.appendChild(script);
 
